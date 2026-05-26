@@ -1,9 +1,113 @@
-# 🚀 React Native — Guia Técnico Completo
+# React Native — Guia Técnico Completo
 
 > **Nível:** Zero (sem experiência prévia)
 > **Linguagem:** JavaScript / TypeScript
-> **Fonte de referência:** [reactnative.dev](https://reactnative.dev/docs/getting-started)
-> **Versão de referência:** React Native 0.74+
+> **Referência oficial:** [reactnative.dev](https://reactnative.dev/docs/getting-started)
+> **Versão de referência:** React Native 0.74+ / Expo SDK 51+
+> **Fontes:** Material didático UNISATC — Prof. Thyerri Mezzari + documentação oficial
+
+---
+
+## Prefácio
+
+Este guia reúne, em documento único, todo o conhecimento necessário para desenvolver aplicativos móveis com React Native partindo do absoluto zero. O conteúdo foi organizado de forma progressiva: cada parte pressupõe o domínio da anterior. Não é um tutorial de copiar e colar — cada bloco de código é acompanhado de explicação linha a linha, comparativos com tecnologias equivalentes e indicação explícita de armadilhas comuns. O leitor encontrará aqui desde a arquitetura interna do framework até o build de produção nas lojas, passando por componentes, estado, navegação, requisições HTTP, persistência, testes e performance. Exemplos práticos foram extraídos de aulas reais e expandidos com padrões da indústria. Palavras-chave técnicas estão linkadas ao Glossário ao final do documento. Ao terminar a leitura, o leitor estará apto a criar, organizar, otimizar e publicar um app React Native completo.
+
+---
+
+## Sumário
+
+- [Parte 1 — Introdução e Contextualização](#parte-1--introdução-e-contextualização)
+  - [1.1 O que é React Native?](#11-o-que-é-react-native)
+  - [1.2 Como o React Native funciona internamente](#12-como-o-react-native-funciona-internamente)
+  - [1.3 O problema que o React Native resolve](#13-o-problema-que-o-react-native-resolve)
+  - [1.4 React Native vs Flutter](#14-react-native-vs-flutter)
+  - [1.5 O paradigma declarativo](#15-o-paradigma-declarativo)
+- [Parte 2 — Configuração do Ambiente](#parte-2--configuração-do-ambiente)
+  - [2.1 Expo vs React Native CLI](#21-expo-vs-react-native-cli)
+  - [2.2 Criando o primeiro projeto com Expo](#22-criando-o-primeiro-projeto-com-expo)
+  - [2.3 Estrutura de pastas do projeto](#23-estrutura-de-pastas-do-projeto)
+  - [2.4 O arquivo App.tsx](#24-o-arquivo-apptsx)
+- [Parte 3 — Componentes Fundamentais](#parte-3--componentes-fundamentais)
+  - [3.1 O que são componentes](#31-o-que-são-componentes)
+  - [3.2 View](#32-view)
+  - [3.3 Text](#33-text)
+  - [3.4 Image](#34-image)
+  - [3.5 TextInput](#35-textinput)
+  - [3.6 TouchableOpacity e Pressable](#36-touchableopacity-e-pressable)
+  - [3.7 ScrollView](#37-scrollview)
+  - [3.8 Props e Children](#38-props-e-children)
+- [Parte 4 — Estilização](#parte-4--estilização)
+  - [4.1 StyleSheet](#41-stylesheet)
+  - [4.2 Flexbox no React Native](#42-flexbox-no-react-native)
+  - [4.3 Estilos dinâmicos e condicionais](#43-estilos-dinâmicos-e-condicionais)
+- [Parte 5 — Estado e Hooks](#parte-5--estado-e-hooks)
+  - [5.1 O que é estado](#51-o-que-é-estado)
+  - [5.2 useState](#52-usestate)
+  - [5.3 Atualização funcional do estado](#53-atualização-funcional-do-estado)
+  - [5.4 useEffect](#54-useeffect)
+  - [5.5 useMemo e useCallback](#55-usememo-e-usecallback)
+  - [5.6 Custom Hooks](#56-custom-hooks)
+- [Parte 6 — Listas e FlatList](#parte-6--listas-e-flatlist)
+  - [6.1 Por que ScrollView não serve para listas longas](#61-por-que-scrollview-não-serve-para-listas-longas)
+  - [6.2 FlatList](#62-flatlist)
+  - [6.3 SectionList](#63-sectionlist)
+- [Parte 7 — Navegação com React Navigation](#parte-7--navegação-com-react-navigation)
+  - [7.1 Instalação](#71-instalação)
+  - [7.2 Stack Navigator](#72-stack-navigator)
+  - [7.3 Navegar e passar parâmetros](#73-navegar-e-passar-parâmetros)
+  - [7.4 Bottom Tab Navigator](#74-bottom-tab-navigator)
+  - [7.5 Navegação aninhada](#75-navegação-aninhada)
+- [Parte 8 — Gerenciamento de Estado Global](#parte-8--gerenciamento-de-estado-global)
+  - [8.1 Context API](#81-context-api)
+  - [8.2 Zustand](#82-zustand)
+- [Parte 9 — Requisições HTTP](#parte-9--requisições-http)
+  - [9.1 Fetch nativo](#91-fetch-nativo)
+  - [9.2 Axios](#92-axios)
+  - [9.3 TanStack Query](#93-tanstack-query)
+- [Parte 10 — Persistência de Dados](#parte-10--persistência-de-dados)
+  - [10.1 AsyncStorage](#101-asyncstorage)
+  - [10.2 MMKV](#102-mmkv)
+  - [10.3 SQLite com expo-sqlite](#103-sqlite-com-expo-sqlite)
+- [Parte 11 — Permissões](#parte-11--permissões)
+  - [11.1 Por que permissões existem](#111-por-que-permissões-existem)
+  - [11.2 Câmera e Galeria](#112-câmera-e-galeria)
+  - [11.3 Localização](#113-localização)
+- [Parte 12 — Frameworks de UI e Ícones](#parte-12--frameworks-de-ui-e-ícones)
+  - [12.1 React Native Paper](#121-react-native-paper)
+  - [12.2 NativeWind](#122-nativewind)
+  - [12.3 Ícones](#123-ícones)
+- [Parte 13 — Animações](#parte-13--animações)
+  - [13.1 Animated API](#131-animated-api)
+  - [13.2 Reanimated 3](#132-reanimated-3)
+  - [13.3 Lottie](#133-lottie)
+- [Parte 14 — TypeScript no React Native](#parte-14--typescript-no-react-native)
+  - [14.1 Tipagem de componentes e props](#141-tipagem-de-componentes-e-props)
+  - [14.2 Utility Types](#142-utility-types)
+  - [14.3 Tipagem de navegação](#143-tipagem-de-navegação)
+  - [14.4 Tipagem de estado e hooks](#144-tipagem-de-estado-e-hooks)
+- [Parte 15 — Performance e Otimização](#parte-15--performance-e-otimização)
+  - [15.1 React.memo](#151-reactmemo)
+  - [15.2 O problema com funções inline em FlatList](#152-o-problema-com-funções-inline-em-flatlist)
+  - [15.3 Hermes](#153-hermes)
+  - [15.4 Tabela de otimizações](#154-tabela-de-otimizações)
+- [Parte 16 — Testes](#parte-16--testes)
+  - [16.1 Estrutura de testes](#161-estrutura-de-testes)
+  - [16.2 Jest — testes unitários](#162-jest--testes-unitários)
+  - [16.3 React Native Testing Library](#163-react-native-testing-library)
+- [Parte 17 — Tratamento de Erros em Produção](#parte-17--tratamento-de-erros-em-produção)
+  - [17.1 Error Boundaries](#171-error-boundaries)
+  - [17.2 Sentry](#172-sentry)
+- [Parte 18 — Formulários](#parte-18--formulários)
+  - [18.1 React Hook Form + Zod](#181-react-hook-form--zod)
+- [Parte 19 — Build e Publicação](#parte-19--build-e-publicação)
+  - [19.1 Os três ambientes Expo](#191-os-três-ambientes-expo)
+  - [19.2 EAS Build](#192-eas-build)
+  - [19.3 Build com React Native CLI](#193-build-com-react-native-cli)
+- [Parte 20 — Arquitetura e Boas Práticas](#parte-20--arquitetura-e-boas-práticas)
+  - [20.1 Estrutura de projeto escalável](#201-estrutura-de-projeto-escalável)
+  - [20.2 Separação entre UI e lógica](#202-separação-entre-ui-e-lógica)
+- [Parte 21 — Mapa do Ecossistema](#parte-21--mapa-do-ecossistema)
+- [Glossário](#glossário)
 
 ---
 
@@ -13,11 +117,11 @@
 
 ### 1.1 O que é React Native?
 
-React Native é um **framework de código aberto criado pelo Facebook (Meta) em 2015** para construir aplicativos móveis nativos usando JavaScript e React. Diferentemente de soluções que apenas embrulham um WebView, o React Native **renderiza componentes nativos reais** da plataforma — os mesmos que aparecem em apps escritos em Swift (iOS) ou Kotlin (Android).
+React Native é um [framework](#framework) de código aberto criado pelo Meta (Facebook) em 2015 para construir aplicativos móveis nativos usando [JavaScript](#javascript) e [React](#react). Diferentemente de soluções que apenas embrulham um [WebView](#webview), o React Native **renderiza componentes nativos reais** da plataforma — os mesmos que aparecem em apps escritos em Swift (iOS) ou Kotlin (Android).
 
 O slogan histórico do framework é: **"Learn once, write anywhere"** — aprenda uma vez, escreva para qualquer plataforma. Isso significa que você escreve um único código JavaScript e ele gera interfaces nativas para iOS e Android simultaneamente.
 
-Em 2022, o React Native passou por uma reestruturação interna significativa chamada **Nova Arquitetura** (New Architecture), que trouxe o motor JavaScript **Hermes**, o sistema de renderização **Fabric** e o sistema de módulos nativos **TurboModules**. Essa arquitetura está disponível por padrão a partir da versão 0.74.
+Em 2022, o React Native passou por uma reestruturação interna chamada **Nova Arquitetura**, que trouxe o motor JavaScript [Hermes](#hermes), o sistema de renderização [Fabric](#fabric) e o sistema de módulos nativos [TurboModules](#turbomodules). Essa arquitetura está disponível por padrão a partir da versão 0.74.
 
 ---
 
@@ -25,38 +129,41 @@ Em 2022, o React Native passou por uma reestruturação interna significativa ch
 
 Para entender o React Native, é necessário entender o que diferencia ele de uma solução WebView.
 
-#### Abordagem WebView (Ionic, Capacitor)
+**Abordagem WebView (Ionic, Capacitor):**
 
 ```
 JavaScript → WebView → renderiza HTML/CSS → visual "nativo" simulado
 ```
 
-Apps WebView são basicamente sites dentro de um container. O botão que o usuário vê é um `<button>` HTML estilizado com CSS — não é o botão nativo do iOS ou Android. O resultado visual pode ser similar, mas o comportamento, a performance e a acessibilidade diferem do nativo.
+Apps WebView são basicamente sites dentro de um container. O botão que o usuário vê é um `<button>` HTML estilizado com CSS — não é o botão nativo do iOS ou Android.
 
-#### Abordagem React Native
+**Abordagem React Native:**
 
 ```
 JavaScript → Bridge/JSI → componentes nativos reais (UIButton, android.widget.Button)
 ```
 
-Quando você escreve `<Button />` no React Native, o framework instrui o sistema operacional a criar um botão nativo real — o mesmo componente que um desenvolvedor Swift ou Kotlin criaria. O JavaScript descreve **o que** mostrar; o sistema operacional decide **como** renderizar.
+Quando você escreve `<Button />` no React Native, o framework instrui o sistema operacional a criar um botão nativo real. O JavaScript descreve **o que** mostrar; o SO decide **como** renderizar.
 
-**Comparativo de abordagens:**
+O framework opera com duas [threads](#thread) principais:
 
-| Abordagem | Exemplos | Como renderiza | Performance | Acesso a APIs nativas |
-|---|---|---|---|---|
-| WebView | Ionic, Capacitor | HTML/CSS em WebView | Limitada | Via bridge JS |
-| React Native | React Native | Componentes nativos reais | Alta | Via bridge/JSI |
-| Compilado nativo | Flutter | Renderização própria (Skia/Impeller) | Muito alta | Direta |
-| Nativo puro | Swift/Kotlin | Componentes do SO | Máxima | Direta |
+- **Main thread (nativa):** responsável pela renderização e pelo comportamento nativo do app.
+- **JS thread:** executa o código JavaScript da aplicação (lógica de negócio, estado, etc.).
+
+Essas threads nunca se comunicam diretamente. A comunicação passa pela **[Bridge](#bridge)**, que tem três características: assíncrona, em lote (*batched*) e serializada (formato JSON).
+
+| Abordagem | Exemplos | Como renderiza | Performance |
+|---|---|---|---|
+| WebView | Ionic, Capacitor | HTML/CSS em WebView | Limitada |
+| React Native | React Native | Componentes nativos reais | Alta |
+| Compilado nativo | Flutter | Engine própria (Skia/Impeller) | Muito alta |
+| Nativo puro | Swift/Kotlin | Componentes do SO | Máxima |
 
 ---
 
 ### 1.3 O problema que o React Native resolve
 
-Antes do React Native, um app para iOS e Android exigia **duas equipes separadas** trabalhando em duas bases de código completamente distintas — Swift/Objective-C para iOS e Java/Kotlin para Android. Toda funcionalidade precisava ser implementada duas vezes, com bugs diferentes, ciclos de lançamento diferentes e custos dobrados.
-
-**Comparativo do problema:**
+Antes do React Native, um app para iOS e Android exigia **duas equipes separadas** com duas bases de código completamente distintas. Toda funcionalidade precisava ser implementada duas vezes.
 
 | Problema (desenvolvimento nativo duplo) | Como o React Native resolve |
 |---|---|
@@ -68,9 +175,7 @@ Antes do React Native, um app para iOS e Android exigia **duas equipes separadas
 
 ---
 
-### 1.4 React Native vs Flutter — comparativo honesto
-
-Estas são as duas opções dominantes de desenvolvimento cross-platform em 2024. Não existe resposta universalmente correta — a escolha depende do contexto.
+### 1.4 React Native vs Flutter
 
 | Critério | React Native | Flutter |
 |---|---|---|
@@ -80,30 +185,25 @@ Estas são as duas opções dominantes de desenvolvimento cross-platform em 2024
 | **Visual** | Segue as convenções de cada plataforma | Consistente em todas as plataformas |
 | **Curva de aprendizado** | Baixa para devs web | Média — Dart é nova linguagem |
 | **Ecossistema** | Enorme — npm com milhões de pacotes | Crescente — pub.dev |
-| **Mercado de trabalho** | Muito alto | Alto e crescendo |
-| **Performance** | Muito boa | Excelente |
-| **Hot Reload** | Sim | Sim |
 | **Tamanho do app** | Menor | Maior (inclui engine Flutter) |
 | **Quando escolher** | Time com background web, prazo curto | Consistência visual total, performance máxima |
 
 ---
 
-### 1.5 O paradigma declarativo no React Native
+### 1.5 O paradigma declarativo
 
-React Native herda o paradigma declarativo do React. Assim como no Jetpack Compose, a interface é sempre uma função do estado atual dos dados.
+React Native herda o paradigma [declarativo](#paradigma-declarativo) do React. A interface é sempre uma função do estado atual dos dados:
 
 ```
 UI = f(estado)
 ```
 
-**Paradigma imperativo (o que não existe no React Native moderno):**
+**Paradigma imperativo (o que NÃO existe no React Native moderno):**
 
 ```javascript
 // Você NÃO faz isso no React Native moderno
-// Não existe "encontre esse elemento e mude sua cor"
 const botao = document.getElementById('meuBotao');
-botao.style.backgroundColor = 'red';
-botao.textContent = 'Erro!';
+botao.style.backgroundColor = 'red'; // manipulação manual do elemento
 ```
 
 **Paradigma declarativo (a abordagem correta):**
@@ -120,8 +220,6 @@ function MeuBotao({ temErro }) {
 // Quando temErro muda, o React recalcula e atualiza a UI automaticamente
 ```
 
-**A diferença fundamental:**
-
 | | Imperativo | Declarativo |
 |---|---|---|
 | Quando a tela muda | Você manipula elementos manualmente | O React reexecuta o componente automaticamente |
@@ -130,94 +228,94 @@ function MeuBotao({ temErro }) {
 
 ---
 
-### 1.6 Resumo da Parte 1
-
-| Conceito | Definição resumida |
-|---|---|
-| React Native | Framework da Meta para criar apps móveis nativos com JavaScript/React |
-| Componentes nativos | React Native renderiza UIButton/android.widget.Button — não HTML |
-| "Learn once, write anywhere" | Um código JavaScript para iOS e Android |
-| Nova Arquitetura | Hermes + Fabric + TurboModules — padrão desde RN 0.74 |
-| Paradigma declarativo | UI = f(estado) — você descreve o resultado, não os passos |
-
----
-
 ## Parte 2 — Configuração do Ambiente
 
 ---
 
-### 2.1 As duas formas de começar
+### 2.1 Expo vs React Native CLI
 
 Existem dois pontos de entrada no ecossistema React Native:
 
 | Abordagem | Ferramenta | Quando usar |
 |---|---|---|
-| **Expo** | `create-expo-app` | Início rápido, prototipagem, apps sem código nativo customizado |
-| **React Native CLI** | `@react-native-community/cli` | Controle total, código nativo customizado, produção |
+| **[Expo](#expo)** | `create-expo-app` | Início rápido, prototipagem, apps sem código nativo customizado |
+| **React Native CLI** | `@react-native-community/cli` | Controle total, módulos nativos customizados, produção avançada |
 
-#### Expo — o caminho recomendado para iniciantes
+**Limitações do Expo Go:** o Expo Go só suporta as APIs incluídas no SDK do Expo. Se você precisar de um módulo nativo não incluído (SDK de pagamento específico, Bluetooth customizado, etc.), precisará usar um **Expo Development Build** ou migrar para React Native CLI.
 
-O **Expo** é uma plataforma construída sobre o React Native que abstrai toda a complexidade de configuração do ambiente nativo. Com o Expo, você não precisa instalar Xcode ou Android Studio para começar — basta um celular com o app **Expo Go** instalado.
+---
+
+### 2.2 Criando o primeiro projeto com Expo
 
 ```bash
 # Criar um novo projeto com Expo
-npx create-expo-app@latest MeuApp
+npx create-expo-app@latest --template blank MeuApp
 cd MeuApp
 
 # Iniciar o servidor de desenvolvimento
 npx expo start
 ```
 
-Após rodar `npx expo start`, um QR code aparece no terminal. Escaneie com o app **Expo Go** no seu celular e o app aparece instantaneamente.
+Após rodar `npx expo start`, um QR code aparece no terminal. Escaneie com o app **Expo Go** no celular e o app aparece instantaneamente.
 
-**Limitações do Expo Go:** o Expo Go só suporta as APIs incluídas no SDK do Expo. Se você precisar de um módulo nativo que não está no SDK (como um SDK de pagamento específico, Bluetooth personalizado, etc.), precisará usar um **Expo Development Build** ou migrar para React Native CLI.
+Atalhos úteis no terminal enquanto o projeto está rodando:
 
-#### React Native CLI — controle total
-
-```bash
-# Pré-requisitos: Node.js, JDK, Android Studio, Xcode (macOS)
-
-# Criar projeto com React Native CLI
-npx @react-native-community/cli@latest init MeuApp
-cd MeuApp
-
-# Rodar no Android (emulador ou dispositivo físico)
-npx react-native run-android
-
-# Rodar no iOS (apenas macOS, requer Xcode)
-npx react-native run-ios
-```
+| Tecla | Ação |
+|---|---|
+| `a` | Abre o emulador Android |
+| `i` | Abre o simulador iOS (apenas macOS) |
+| `r` | Reinicia/recarrega o app |
+| `Ctrl+C` | Encerra o servidor |
 
 ---
 
-### 2.2 Estrutura de um projeto React Native
+### 2.3 Estrutura de pastas do projeto
 
 ```
 MeuApp/
-├── android/          → código nativo Android (Kotlin/Java)
-├── ios/              → código nativo iOS (Swift/Objective-C)
+├── android/          → código nativo Android (Kotlin/Java) — apenas no CLI
+├── ios/              → código nativo iOS (Swift/Objective-C) — apenas no CLI
 ├── src/              → seu código JavaScript/TypeScript (convenção)
-│   ├── components/   → componentes reutilizáveis
-│   ├── screens/      → telas do app
-│   ├── navigation/   → configuração de navegação
-│   └── services/     → chamadas de API, utilitários
+│   ├── components/   → componentes reutilizáveis (botões, cards, etc.)
+│   ├── screens/      → telas do app (cada arquivo = uma tela)
+│   ├── navigation/   → configuração de rotas e tipos de navegação
+│   ├── hooks/        → custom hooks reutilizáveis
+│   ├── services/     → chamadas de API, utilitários
+│   ├── stores/       → estado global (Zustand, Context)
+│   └── types/        → tipos TypeScript compartilhados
 ├── App.tsx           → componente raiz do app
 ├── index.js          → ponto de entrada (registra o app)
 ├── package.json      → dependências e scripts
 └── tsconfig.json     → configuração do TypeScript
 ```
 
+> **Dica:** Dan Abramov (colaborador principal do React/Meta) afirma que não existe estrutura "oficial" obrigatória. A regra prática é: mova arquivos para subpastas quando a quantidade incomodar. Consulte https://react-file-structure.surge.sh para mais.
+
+Para código específico por plataforma, há dois caminhos:
+
+```
+// 1. Arquivo específico por plataforma
+MeuComponente.android.js  → carregado apenas no Android
+MeuComponente.ios.js      → carregado apenas no iOS
+
+// 2. API Platform dentro do código
+import { Platform } from 'react-native';
+const valor = Platform.OS === 'ios' ? 'valor_ios' : 'valor_android';
+```
+
 ---
 
-### 2.3 O arquivo App.tsx — ponto de entrada
+### 2.4 O arquivo App.tsx
 
 ```tsx
 // App.tsx — o componente raiz que o sistema carrega primeiro
+// Tudo que aparecer aqui é o ponto de partida visual do app
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 export default function App() {
   return (
+    // View é o contêiner raiz — equivale a uma <div> no HTML
     <View style={styles.container}>
       <Text style={styles.titulo}>Olá, React Native!</Text>
     </View>
@@ -226,9 +324,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,              // ocupa todo o espaço disponível
+    justifyContent: 'center', // centraliza verticalmente
+    alignItems: 'center', // centraliza horizontalmente
     backgroundColor: '#fff',
   },
   titulo: {
@@ -244,11 +342,11 @@ const styles = StyleSheet.create({
 
 ---
 
-### 3.1 O que são componentes no React Native?
+### 3.1 O que são componentes
 
-No React Native, **componentes são os blocos de construção da interface**. Cada componente é uma função JavaScript que descreve uma parte da UI. Diferentemente do React para web, aqui não existem elementos HTML — os componentes mapeiam diretamente para elementos nativos.
+No React Native, **componentes são os blocos de construção da interface**. Cada componente é uma função JavaScript que descreve uma parte da UI. Diferentemente do React para web, não existem elementos HTML — os componentes mapeiam diretamente para elementos nativos.
 
-| React (Web) | React Native | Elemento nativo iOS | Elemento nativo Android |
+| React (Web) | React Native | iOS nativo | Android nativo |
 |---|---|---|---|
 | `<div>` | `<View>` | `UIView` | `android.view.View` |
 | `<p>`, `<span>`, `<h1>` | `<Text>` | `UILabel` | `android.widget.TextView` |
@@ -256,13 +354,12 @@ No React Native, **componentes são os blocos de construção da interface**. Ca
 | `<input>` | `<TextInput>` | `UITextField` | `android.widget.EditText` |
 | `<button>` | `<TouchableOpacity>` / `<Pressable>` | `UIButton` | `android.widget.Button` |
 | `<ul>` + `<li>` | `<FlatList>` | `UITableView` | `RecyclerView` |
-| `<select>` | — | `UIPickerView` | `Spinner` |
 
 ---
 
-### 3.2 View — o contêiner fundamental
+### 3.2 View
 
-`View` é o componente mais básico do React Native. Equivale à `<div>` do HTML e ao `Column`/`Box` do Compose. Ele é um contêiner invisível que organiza outros componentes.
+`View` é o componente mais básico do React Native. Equivale à `<div>` do HTML. É um contêiner invisível que organiza outros componentes e serve como bloco de layout.
 
 ```tsx
 import { View, Text, StyleSheet } from 'react-native';
@@ -272,7 +369,7 @@ function ExemploView() {
     // View externa — contêiner principal
     <View style={styles.container}>
 
-      {/* View interna — agrupa os textos */}
+      {/* View interna — agrupa textos em uma caixa */}
       <View style={styles.caixa}>
         <Text>Primeiro</Text>
         <Text>Segundo</Text>
@@ -284,13 +381,13 @@ function ExemploView() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,          // ocupa todo o espaço disponível
+    flex: 1,          // ocupa todo o espaço disponível da tela
     padding: 16,
     backgroundColor: '#f5f5f5',
   },
   caixa: {
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 8,  // cantos arredondados
     padding: 12,
   },
 });
@@ -298,9 +395,9 @@ const styles = StyleSheet.create({
 
 ---
 
-### 3.3 Text — exibindo texto
+### 3.3 Text
 
-`Text` é o único componente que pode conter texto no React Native. Diferentemente do HTML, onde texto pode aparecer diretamente em qualquer elemento, no React Native **todo texto deve estar dentro de um componente `<Text>`**.
+`Text` é o único componente que pode conter texto. No React Native, **todo texto deve estar dentro de um `<Text>`** — diferentemente do HTML, onde texto pode aparecer dentro de qualquer elemento.
 
 ```tsx
 import { Text, View } from 'react-native';
@@ -316,7 +413,7 @@ function ExemploText() {
         Título grande
       </Text>
 
-      {/* Aninhamento de Text — herda estilos do pai */}
+      {/* Aninhamento — Text filho herda estilos do Text pai */}
       <Text style={{ color: 'gray' }}>
         Texto cinza com{' '}
         <Text style={{ fontWeight: 'bold', color: 'black' }}>
@@ -327,7 +424,7 @@ function ExemploText() {
 
       {/* numberOfLines trunca o texto com reticências */}
       <Text numberOfLines={2} ellipsizeMode="tail">
-        Este é um texto muito longo que será truncado após duas linhas...
+        Este texto longo será truncado após duas linhas...
         Lorem ipsum dolor sit amet consectetur adipiscing elit.
       </Text>
     </View>
@@ -335,15 +432,15 @@ function ExemploText() {
 }
 ```
 
-> ⚠️ **Erro comum:** colocar texto fora de `<Text>` causa um erro de tempo de execução:
+> **Erro comum:** colocar texto diretamente fora de `<Text>` causa erro de tempo de execução:
 > ```tsx
-> <View>Texto aqui</View>  // ❌ ERRO: Text strings must be rendered within a <Text> component
-> <View><Text>Texto aqui</Text></View>  // ✅ correto
+> <View>Texto aqui</View>       // ❌ ERRO em tempo de execução
+> <View><Text>Texto</Text></View> // ✅ correto
 > ```
 
 ---
 
-### 3.4 Image — exibindo imagens
+### 3.4 Image
 
 ```tsx
 import { Image, View } from 'react-native';
@@ -351,20 +448,20 @@ import { Image, View } from 'react-native';
 function ExemploImage() {
   return (
     <View>
-      {/* Imagem local — da pasta assets do projeto */}
+      {/* Imagem local — referenciada com require() */}
       <Image
         source={require('./assets/logo.png')}
         style={{ width: 200, height: 100 }}
       />
 
-      {/* Imagem remota — de uma URL */}
-      {/* width e height são OBRIGATÓRIOS para imagens remotas */}
+      {/* Imagem remota — width e height são OBRIGATÓRIOS para imagens remotas */}
+      {/* Sem width/height a imagem não aparece */}
       <Image
         source={{ uri: 'https://picsum.photos/200/100' }}
         style={{ width: 200, height: 100, borderRadius: 8 }}
       />
 
-      {/* resizeMode controla como a imagem preenche o espaço */}
+      {/* resizeMode controla como a imagem preenche o espaço disponível */}
       <Image
         source={{ uri: 'https://picsum.photos/400/200' }}
         style={{ width: 200, height: 100 }}
@@ -375,11 +472,11 @@ function ExemploImage() {
 }
 ```
 
-> **Atenção:** Para imagens remotas em produção, use a biblioteca **Expo Image** ou **react-native-fast-image** em vez do `Image` padrão. Elas oferecem cache avançado, melhor performance e placeholder durante o carregamento — equivalente ao Coil no Android.
+> Para imagens remotas em produção, prefira **Expo Image** (`npx expo install expo-image`) em vez do `Image` padrão — ela oferece cache avançado, placeholder durante carregamento e melhor performance.
 
 ---
 
-### 3.5 TextInput — entrada de texto
+### 3.5 TextInput
 
 ```tsx
 import { TextInput, View, Text } from 'react-native';
@@ -395,11 +492,11 @@ function ExemploTextInput() {
       {/* Campo básico */}
       <TextInput
         value={email}
-        onChangeText={setEmail}          // chamado a cada tecla pressionada
+        onChangeText={setEmail}           // chamado a cada tecla pressionada
         placeholder="Digite seu e-mail"
         placeholderTextColor="#999"
-        keyboardType="email-address"     // abre teclado com @
-        autoCapitalize="none"
+        keyboardType="email-address"      // abre teclado com @ visível
+        autoCapitalize="none"             // não capitaliza automaticamente
         style={{
           borderWidth: 1,
           borderColor: '#ccc',
@@ -414,7 +511,7 @@ function ExemploTextInput() {
         value={senha}
         onChangeText={setSenha}
         placeholder="Senha"
-        secureTextEntry={true}           // oculta o texto (bullets)
+        secureTextEntry={true}            // oculta os caracteres digitados
         placeholderTextColor="#999"
         style={{
           borderWidth: 1,
@@ -425,15 +522,15 @@ function ExemploTextInput() {
         }}
       />
 
-      <Text>E-mail digitado: {email}</Text>
+      <Text>E-mail: {email}</Text>
     </View>
   );
 }
 ```
 
-**Propriedades mais utilizadas do TextInput:**
+**Propriedades mais utilizadas:**
 
-| Propriedade | O que faz | Exemplo de valor |
+| Propriedade | O que faz | Exemplo |
 |---|---|---|
 | `value` | Valor controlado pelo estado | `email` |
 | `onChangeText` | Callback a cada caractere digitado | `(texto) => setEmail(texto)` |
@@ -447,7 +544,7 @@ function ExemploTextInput() {
 
 ---
 
-### 3.6 TouchableOpacity e Pressable — interações de toque
+### 3.6 TouchableOpacity e Pressable
 
 ```tsx
 import { TouchableOpacity, Pressable, Text, View } from 'react-native';
@@ -474,7 +571,7 @@ function ExemploBotoes() {
       </TouchableOpacity>
 
       {/* Pressable — mais moderno e flexível */}
-      {/* Recebe o estado de pressionamento como parâmetro */}
+      {/* Recebe o estado de pressionamento como parâmetro do style */}
       <Pressable
         onPress={() => console.log('Pressable!')}
         style={({ pressed }) => ({
@@ -482,7 +579,6 @@ function ExemploBotoes() {
           padding: 16,
           borderRadius: 8,
           alignItems: 'center',
-          opacity: pressed ? 0.8 : 1,
         })}
       >
         {({ pressed }) => (
@@ -497,18 +593,16 @@ function ExemploBotoes() {
 }
 ```
 
-**Comparativo dos componentes de toque:**
-
 | Componente | Feedback visual | Quando usar |
 |---|---|---|
 | `TouchableOpacity` | Reduz opacidade | Botões gerais — o mais usado |
 | `TouchableHighlight` | Escurece o fundo | Listas com itens clicáveis |
-| `TouchableWithoutFeedback` | Nenhum | Fechar teclado ao tocar na tela |
+| `TouchableWithoutFeedback` | Nenhum | Fechar teclado ao tocar fora |
 | `Pressable` | Totalmente customizável | Quando precisa de controle total do estado de pressão |
 
 ---
 
-### 3.7 ScrollView — conteúdo rolável
+### 3.7 ScrollView
 
 ```tsx
 import { ScrollView, View, Text } from 'react-native';
@@ -521,7 +615,7 @@ function ExemploScrollView() {
       style={{ flex: 1 }}
       contentContainerStyle={{ padding: 16 }}
       showsVerticalScrollIndicator={false}   // esconde a barra de rolagem
-      horizontal={false}                     // true para rolagem horizontal
+      horizontal={false}                     // true = rolagem horizontal
     >
       {Array.from({ length: 20 }, (_, i) => (
         <View key={i} style={{ height: 80, backgroundColor: '#eee', marginBottom: 8, borderRadius: 8 }}>
@@ -533,17 +627,86 @@ function ExemploScrollView() {
 }
 ```
 
-> ⚠️ `ScrollView` renderiza **todos** os filhos imediatamente, igual ao `Column` no Jetpack Compose. Para listas longas, use `FlatList` — a versão virtualizada que só renderiza os itens visíveis.
+> **Atenção:** `ScrollView` renderiza **todos** os filhos imediatamente na memória. Para listas longas, use `FlatList` — ela só renderiza os itens visíveis na tela (virtualização).
 
 ---
 
-## Parte 4 — Estilização no React Native
+### 3.8 Props e Children
+
+**Props** são os parâmetros que um componente recebe. São a forma de injetar dados externos em um componente.
+
+```tsx
+// Declarando quais props o componente aceita
+function KittenCard({ titulo, texto, labelBotao = 'Clique Aqui' }) {
+  //                                              ↑ valor padrão para prop opcional
+  return (
+    <View>
+      <Text>{titulo}</Text>
+      <Text>{texto}</Text>
+      {/* Renderiza o botão APENAS se labelBotao estiver preenchido */}
+      {!!labelBotao && (
+        <TouchableOpacity onPress={() => console.log('Pressionou')}>
+          <Text>{labelBotao}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+// Usando o componente com props
+function App() {
+  return (
+    <View>
+      <KittenCard
+        titulo="Adote um Gatinho!"
+        texto="Eles destroem seus móveis mas são fofos."
+        labelBotao="Quero Adotar"
+      />
+      <KittenCard
+        titulo="Outro Gato"
+        texto="Também muito fofo."
+        // labelBotao omitido → usa o valor padrão 'Clique Aqui'
+      />
+    </View>
+  );
+}
+```
+
+**Children** é uma prop reservada do React que permite injetar conteúdo JSX dentro de um componente:
+
+```tsx
+// O parâmetro "children" é uma reserved keyword do React
+function KittenCard({ titulo, children, labelBotao }) {
+  return (
+    <View>
+      <Text>{titulo}</Text>
+      {/* children recebe tudo que for colocado entre as tags do componente */}
+      <View>{children}</View>
+      {!!labelBotao && <Text>{labelBotao}</Text>}
+    </View>
+  );
+}
+
+// Uso: o conteúdo entre as tags vai para "children"
+function App() {
+  return (
+    <KittenCard titulo="Adote um Gatinho!" labelBotao="Quero Adotar">
+      <Text>Primeiro parágrafo</Text>
+      <Text>Segundo parágrafo</Text>
+    </KittenCard>
+  );
+}
+```
 
 ---
 
-### 4.1 StyleSheet — o sistema de estilos
+## Parte 4 — Estilização
 
-No React Native, **não existe CSS**. A estilização é feita via objetos JavaScript que seguem uma API inspirada no CSS, mas com diferenças importantes. O `StyleSheet.create()` é o método recomendado para definir estilos.
+---
+
+### 4.1 StyleSheet
+
+No React Native, **não existe CSS**. A estilização é feita via objetos JavaScript que seguem uma API inspirada no CSS, com diferenças importantes.
 
 ```tsx
 import { StyleSheet, View, Text } from 'react-native';
@@ -552,15 +715,16 @@ function ExemploEstilos() {
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Título</Text>
+      {/* Array de estilos — os objetos são mesclados da esquerda para a direita */}
       <Text style={[styles.texto, styles.destaque]}>
-        Múltiplos estilos — o array mescla os objetos
+        Texto com múltiplos estilos
       </Text>
     </View>
   );
 }
 
 // StyleSheet.create() valida os estilos em tempo de desenvolvimento
-// e otimiza a performance ao enviar os estilos para o lado nativo
+// e otimiza a performance ao enviar estilos para a camada nativa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -585,7 +749,7 @@ const styles = StyleSheet.create({
 });
 ```
 
-**Diferenças críticas entre CSS e React Native StyleSheet:**
+**Diferenças críticas entre CSS e StyleSheet:**
 
 | CSS (Web) | React Native | Observação |
 |---|---|---|
@@ -595,17 +759,15 @@ const styles = StyleSheet.create({
 | `display: flex` | Flex por padrão | Todo View já é flex |
 | `flex-direction: column` | `flexDirection: 'column'` | Padrão é `column` (diferente do web que é `row`) |
 | `margin: 8px 16px` | `marginVertical: 8, marginHorizontal: 16` | Sem shorthand de múltiplos valores |
-| `padding: 8px 16px 4px 12px` | Não existe — use `paddingTop`, `paddingRight`, etc. | |
-| `box-shadow` | `shadowColor`, `shadowOffset`, `elevation` | Diferente para iOS e Android |
+| `box-shadow` | `shadowColor`, `shadowOffset`, `elevation` | API diferente para iOS e Android |
 
 ---
 
 ### 4.2 Flexbox no React Native
 
-O React Native usa **Flexbox** como sistema de layout, mas com algumas diferenças do Flexbox web:
+O React Native usa **Flexbox** como sistema de layout, com diferenças em relação ao Flexbox web:
 
-- **`flexDirection` padrão é `'column'`** (web é `'row'`)
-- **`alignContent` padrão é `'flex-start'`** (web é `'stretch'`)
+- `flexDirection` padrão é `'column'` (web é `'row'`)
 - Todo `View` já é `display: flex` por padrão
 
 ```tsx
@@ -615,21 +777,16 @@ function ExemploFlex() {
   return (
     <View style={styles.container}>
 
-      {/* Linha horizontal — equivale a Row no Compose */}
+      {/* Linha horizontal — equivale a Row no Jetpack Compose */}
       <View style={styles.linha}>
+        {/* flex: 2 → ocupa 2/3 do espaço disponível */}
         <View style={[styles.caixa, { flex: 2 }]}>
           <Text>2/3 do espaço</Text>
         </View>
+        {/* flex: 1 → ocupa 1/3 do espaço disponível */}
         <View style={[styles.caixa, { flex: 1, backgroundColor: '#e0e0ff' }]}>
           <Text>1/3 do espaço</Text>
         </View>
-      </View>
-
-      {/* Coluna vertical — equivale a Column no Compose */}
-      <View style={styles.coluna}>
-        <Text>Topo</Text>
-        <Text>Meio</Text>
-        <Text>Base</Text>
       </View>
 
     </View>
@@ -639,15 +796,10 @@ function ExemploFlex() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   linha: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 8,
-  },
-  coluna: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: 120,
+    flexDirection: 'row',         // disposição horizontal
+    justifyContent: 'space-between', // espaço entre os filhos
+    alignItems: 'center',         // alinha verticalmente ao centro
+    gap: 8,                       // espaço entre itens (equivalente a Spacer)
   },
   caixa: { backgroundColor: '#e8f4fd', padding: 8, borderRadius: 4 },
 });
@@ -659,11 +811,11 @@ const styles = StyleSheet.create({
 |---|---|
 | `Column` | `View` com `flexDirection: 'column'` (padrão) |
 | `Row` | `View` com `flexDirection: 'row'` |
-| `Box` | `View` com `position: 'relative'` e filhos `position: 'absolute'` |
+| `Box` | `View` com filhos `position: 'absolute'` |
 | `Modifier.weight(1f)` | `flex: 1` |
 | `Arrangement.SpaceBetween` | `justifyContent: 'space-between'` |
 | `Alignment.CenterVertically` | `alignItems: 'center'` |
-| `Spacer(modifier = Modifier.height(8.dp))` | `<View style={{ height: 8 }} />` ou `gap: 8` |
+| `Spacer(Modifier.height(8.dp))` | `<View style={{ height: 8 }} />` ou `gap: 8` |
 
 ---
 
@@ -681,9 +833,11 @@ function BotaoToggle() {
       onPress={() => setAtivo(!ativo)}
       style={[
         styles.botao,
+        // Aplica um dos dois estilos com base no estado
         ativo ? styles.botaoAtivo : styles.botaoInativo,
       ]}
     >
+      {/* && só adiciona o estilo ao array quando ativo for true */}
       <Text style={[styles.textoBotao, ativo && styles.textoAtivo]}>
         {ativo ? 'Ativado' : 'Desativado'}
       </Text>
@@ -706,32 +860,34 @@ const styles = StyleSheet.create({
 
 ---
 
-### 5.1 O que é estado no React Native?
+### 5.1 O que é estado
 
-Estado é qualquer dado que muda ao longo do tempo e deve causar uma atualização visual quando muda — exatamente o mesmo conceito do `mutableStateOf` no Jetpack Compose.
+Estado é qualquer dado que muda ao longo do tempo e deve causar uma atualização visual quando muda. No React Native, o estado é gerenciado com **[Hooks](#hooks)** — funções especiais do React que permitem adicionar estado e outros recursos a componentes funcionais.
 
-No React Native, o estado é gerenciado com **Hooks** — funções especiais do React que permitem adicionar estado e outros recursos a componentes funcionais.
+Regras dos Hooks:
+1. **Chame Hooks apenas no nível mais alto.** Não dentro de loops, condições ou funções aninhadas.
+2. **Chame Hooks apenas de componentes funcionais** (ou de outros Hooks customizados).
 
 ---
 
-### 5.2 useState — o hook fundamental
+### 5.2 useState
 
-`useState` é equivalente ao `mutableStateOf` + `remember` do Compose. Ele declara um estado que o React monitora e, quando muda, reexecuta o componente.
+`useState` é o Hook mais básico. Ele declara um estado que o React monitora e, quando muda, reexecuta o componente para atualizar a UI.
 
 ```tsx
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-function ContadorCorreto() {
+function Contador() {
   // useState(0) → valor inicial é 0
-  // Retorna [valorAtual, funcaoParaAtualizar]
+  // Retorna: [valorAtual, funcaoParaAtualizar]
   const [contador, setContador] = useState(0);
   const [nome, setNome] = useState('Usuário');
 
   return (
     <View style={styles.container}>
-      <Text style={styles.texto}>Olá, {nome}!</Text>
-      <Text style={styles.texto}>Contagem: {contador}</Text>
+      <Text>Olá, {nome}!</Text>
+      <Text>Contagem: {contador}</Text>
 
       <TouchableOpacity
         style={styles.botao}
@@ -758,7 +914,20 @@ function ContadorCorreto() {
 | `var x by remember { mutableStateOf(0) }` | `const [x, setX] = useState(0)` |
 | `x = novoValor` | `setX(novoValor)` |
 | Recomposição automática | Re-renderização automática |
-| `remember` previne reset na recomposição | `useState` já garante isso |
+
+**useState com objeto complexo (formulário):**
+
+```tsx
+const [formData, setFormData] = useState({
+  nome: '',
+  email: '',
+  idade: '',
+});
+
+// Para atualizar um campo sem sobrescrever os outros:
+// spread operator (...formData) preserva os demais campos
+setFormData({ ...formData, email: 'novo@email.com' });
+```
 
 ---
 
@@ -769,7 +938,7 @@ Quando o novo valor depende do valor anterior, use a **forma funcional** do sett
 ```tsx
 const [contador, setContador] = useState(0);
 
-// ❌ Pode ter bugs em atualizações rápidas — usa o valor do closure
+// ❌ Pode ter bugs em atualizações rápidas
 onPress={() => setContador(contador + 1)}
 
 // ✅ Sempre usa o valor mais recente — forma funcional
@@ -778,9 +947,9 @@ onPress={() => setContador(valorAnterior => valorAnterior + 1)}
 
 ---
 
-### 5.4 useEffect — efeitos colaterais
+### 5.4 useEffect
 
-`useEffect` é usado para executar código que produz efeitos colaterais: buscar dados de uma API, configurar timers, fazer log, etc. Ele é equivalente ao `init { }` do ViewModel do Android.
+`useEffect` é usado para executar código com efeitos colaterais: buscar dados de API, configurar timers, fazer log, etc.
 
 ```tsx
 import { useState, useEffect } from 'react';
@@ -792,6 +961,7 @@ function ExemploUseEffect() {
   const [erro, setErro] = useState(null);
 
   useEffect(() => {
+    // Função assíncrona declarada dentro do useEffect
     async function buscarUsuarios() {
       try {
         const resposta = await fetch('https://jsonplaceholder.typicode.com/users');
@@ -800,6 +970,7 @@ function ExemploUseEffect() {
       } catch (e) {
         setErro('Erro ao carregar dados');
       } finally {
+        // finally garante que carregando=false mesmo se der erro
         setCarregando(false);
       }
     }
@@ -810,8 +981,7 @@ function ExemploUseEffect() {
     return () => {
       console.log('Componente desmontado — cancele requisições aqui');
     };
-  }, []);
-  // [] = array de dependências vazio = executa apenas uma vez (na montagem)
+  }, []); // [] = executa apenas uma vez, na montagem do componente
 
   if (carregando) return <ActivityIndicator size="large" color="#007AFF" />;
   if (erro) return <Text style={{ color: 'red' }}>{erro}</Text>;
@@ -838,13 +1008,14 @@ useEffect(() => { /* executa quando 'userId' ou 'filtro' mudam */ }, [userId, fi
 
 ---
 
-### 5.5 useMemo e useCallback — otimização de performance
+### 5.5 useMemo e useCallback
 
 ```tsx
 import { useMemo, useCallback } from 'react';
 
 function ListaFiltrada({ itens, termoBusca }) {
   // useMemo: recalcula apenas quando 'itens' ou 'termoBusca' mudam
+  // Sem useMemo, o filter rodaria a cada re-render do componente pai
   const itensFiltrados = useMemo(() => {
     return itens.filter(item =>
       item.nome.toLowerCase().includes(termoBusca.toLowerCase())
@@ -852,47 +1023,32 @@ function ListaFiltrada({ itens, termoBusca }) {
   }, [itens, termoBusca]);
 
   // useCallback: memoriza a função — evita recriá-la a cada render
+  // Essencial quando a função é passada como prop para componentes filhos com React.memo
   const handlePress = useCallback((id) => {
     console.log('Item selecionado:', id);
-  }, []);
+  }, []); // [] = a função nunca muda
 
-  return (
-    <FlatList
-      data={itensFiltrados}
-      keyExtractor={item => item.id.toString()}
-      renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => handlePress(item.id)}>
-          <Text>{item.nome}</Text>
-        </TouchableOpacity>
-      )}
-    />
-  );
+  return (/* JSX */);
 }
 ```
 
 ---
 
-### 5.6 Custom Hooks — reutilizando lógica de estado
+### 5.6 Custom Hooks
 
-Custom hooks são funções que encapsulam lógica de estado reutilizável. O nome deve começar com `use`.
+Custom Hooks são funções que encapsulam lógica de estado reutilizável. O nome deve começar com `use`.
 
 ```tsx
 // hooks/useBuscaCep.ts
+// Encapsula toda a lógica de busca de CEP para reutilização em qualquer tela
 import { useState } from 'react';
 
-interface DadosCep {
-  logradouro: string;
-  bairro: string;
-  cidade: string;
-  estado: string;
-}
-
 function useBuscaCep() {
-  const [dados, setDados] = useState<DadosCep | null>(null);
+  const [dados, setDados] = useState(null);
   const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState(null);
 
-  async function buscar(cep: string) {
+  async function buscar(cep) {
     setCarregando(true);
     setErro(null);
     try {
@@ -905,7 +1061,7 @@ function useBuscaCep() {
         cidade: json.localidade,
         estado: json.uf,
       });
-    } catch (e: any) {
+    } catch (e) {
       setErro(e.message);
     } finally {
       setCarregando(false);
@@ -915,7 +1071,7 @@ function useBuscaCep() {
   return { dados, carregando, erro, buscar };
 }
 
-// Uso em qualquer componente
+// Uso em qualquer componente — sem duplicar a lógica
 function TelaCadastro() {
   const [cep, setCep] = useState('');
   const { dados, carregando, erro, buscar } = useBuscaCep();
@@ -936,39 +1092,37 @@ function TelaCadastro() {
 
 ---
 
-## Parte 6 — FlatList e Listas Virtualizadas
+## Parte 6 — Listas e FlatList
 
 ---
 
 ### 6.1 Por que ScrollView não serve para listas longas
 
-Exatamente como o `Column` no Jetpack Compose, o `ScrollView` renderiza todos os filhos de uma vez. Com 500 itens, ele cria 500 elementos nativos simultâneos — causando lentidão e consumo excessivo de memória.
+`ScrollView` renderiza todos os filhos de uma vez na memória. Com 500 itens, ele cria 500 elementos nativos simultâneos — causando lentidão e consumo excessivo de memória.
 
-**A solução: `FlatList`** — a lista virtualizada do React Native.
+**A solução é `FlatList`** — a lista virtualizada do React Native. Ela só renderiza os itens que estão visíveis na tela em um dado momento (equivalente ao `LazyColumn` do Jetpack Compose).
 
 ---
 
-### 6.2 FlatList — listas de alta performance
+### 6.2 FlatList
 
 ```tsx
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 
-interface Tarefa {
-  id: string;
-  titulo: string;
-  concluida: boolean;
-}
-
-const TAREFAS: Tarefa[] = [
+const TAREFAS = [
   { id: '1', titulo: 'Comprar leite', concluida: false },
   { id: '2', titulo: 'Fazer exercício', concluida: true },
+  // ... muitos outros itens
 ];
 
 function ListaTarefas() {
   return (
     <FlatList
       data={TAREFAS}
+      // keyExtractor: fornece uma chave única para cada item
+      // NUNCA use o índice do array como key — use IDs únicos
       keyExtractor={(item) => item.id}
+      // renderItem: função que retorna o JSX de cada linha
       renderItem={({ item, index }) => (
         <View style={styles.item}>
           <Text style={[styles.titulo, item.concluida && styles.concluido]}>
@@ -976,39 +1130,36 @@ function ListaTarefas() {
           </Text>
         </View>
       )}
+      // windowSize: quantos itens fora da tela são mantidos renderizados
       windowSize={10}
+      // removeClippedSubviews: desmonta itens muito distantes da tela (Android)
       removeClippedSubviews={true}
+      // Componentes opcionais para cabeçalho, rodapé e lista vazia
       ListHeaderComponent={<Text style={styles.cabecalho}>Minhas Tarefas</Text>}
       ListFooterComponent={<Text style={styles.rodape}>{TAREFAS.length} tarefas no total</Text>}
       ListEmptyComponent={<Text style={styles.vazio}>Nenhuma tarefa ainda!</Text>}
+      // ItemSeparatorComponent: renderizado entre cada par de itens
       ItemSeparatorComponent={() => <View style={styles.separador} />}
       contentContainerStyle={{ padding: 16 }}
+      // Paginação: onEndReached é chamado quando o usuário chega ao final
       onEndReached={() => carregarMaisItens()}
-      onEndReachedThreshold={0.3}
-      refreshing={carregando}
-      onRefresh={recarregarLista}
+      onEndReachedThreshold={0.3} // dispara quando chega a 30% do fim
+      // Pull to refresh
+      refreshing={false}
+      onRefresh={() => recarregarLista()}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  item: { padding: 16, backgroundColor: 'white', borderRadius: 8 },
-  titulo: { fontSize: 16 },
-  concluido: { textDecorationLine: 'line-through', color: '#999' },
-  cabecalho: { fontSize: 20, fontWeight: 'bold', marginBottom: 12 },
-  rodape: { textAlign: 'center', color: '#999', marginTop: 12 },
-  vazio: { textAlign: 'center', color: '#999', marginTop: 40 },
-  separador: { height: 8 },
-});
 ```
 
 ---
 
-### 6.3 SectionList — listas com seções
+### 6.3 SectionList
 
 ```tsx
 import { SectionList, Text, View } from 'react-native';
 
+// Dados estruturados em seções
 const DADOS_COM_SECOES = [
   { titulo: 'Frutas', data: ['Maçã', 'Banana', 'Laranja'] },
   { titulo: 'Verduras', data: ['Alface', 'Brócolis', 'Cenoura'] },
@@ -1024,6 +1175,7 @@ function ListaComSecoes() {
           <Text>{item}</Text>
         </View>
       )}
+      // renderSectionHeader: cabeçalho exibido antes de cada grupo
       renderSectionHeader={({ section: { titulo } }) => (
         <View style={{ backgroundColor: '#f0f0f0', padding: 8 }}>
           <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{titulo}</Text>
@@ -1034,11 +1186,9 @@ function ListaComSecoes() {
 }
 ```
 
-**Comparativo ScrollView vs FlatList vs SectionList:**
-
 | Componente | Virtualizado | Quando usar |
 |---|---|---|
-| `ScrollView` | ❌ | Conteúdo pequeno e fixo (formulários, detalhes) |
+| `ScrollView` | ❌ | Conteúdo pequeno e fixo (formulários, páginas de detalhe) |
 | `FlatList` | ✅ | Listas com quantidade variável ou grande de itens |
 | `SectionList` | ✅ | Listas agrupadas por categoria/seção |
 
@@ -1048,29 +1198,30 @@ function ListaComSecoes() {
 
 ---
 
-### 7.1 O que é React Navigation?
+### 7.1 Instalação
 
-React Navigation é a **biblioteca de navegação padrão da comunidade React Native**. Ela não faz parte do núcleo do React Native — é instalada separadamente, mas é tão universalmente adotada que é considerada o padrão de facto.
+React Navigation é a biblioteca de navegação padrão da comunidade React Native. Não faz parte do núcleo do framework — é instalada separadamente.
 
 ```bash
 npm install @react-navigation/native
 npm install react-native-screens react-native-safe-area-context
-npm install @react-navigation/native-stack
-npm install @react-navigation/bottom-tabs
+npm install @react-navigation/native-stack       # navegação em pilha
+npm install @react-navigation/bottom-tabs        # abas inferiores
 ```
 
 ---
 
-### 7.2 Stack Navigator — navegação em pilha
+### 7.2 Stack Navigator
 
 ```tsx
 // navigation/AppNavigator.tsx
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+// Definição dos tipos de cada rota e seus parâmetros
 type RootStackParams = {
-  TelaInicial: undefined;
-  TelaDetalhe: { itemId: number; titulo: string };
+  TelaInicial: undefined;                           // sem parâmetros
+  TelaDetalhe: { itemId: number; titulo: string };  // com parâmetros
   TelaPerfil: undefined;
 };
 
@@ -1078,16 +1229,20 @@ const Stack = createNativeStackNavigator<RootStackParams>();
 
 export function AppNavigator() {
   return (
+    // NavigationContainer envolve toda a aplicação — vai em App.tsx
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="TelaInicial"
         screenOptions={{
+          // Estilo global da barra de cabeçalho
           headerStyle: { backgroundColor: '#007AFF' },
           headerTintColor: 'white',
           headerTitleStyle: { fontWeight: 'bold' },
         }}
       >
+        {/* Cada Screen registra uma tela na pilha de navegação */}
         <Stack.Screen name="TelaInicial" component={TelaInicial} options={{ title: 'Início' }} />
+        {/* O título pode ser dinâmico, baseado nos parâmetros recebidos */}
         <Stack.Screen
           name="TelaDetalhe"
           component={TelaDetalhe}
@@ -1102,11 +1257,12 @@ export function AppNavigator() {
 
 ---
 
-### 7.3 Navegar entre telas e passar parâmetros
+### 7.3 Navegar e passar parâmetros
 
 ```tsx
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+// O tipo Props injeta 'navigation' e 'route' com os tipos corretos
 type Props = NativeStackScreenProps<RootStackParams, 'TelaInicial'>;
 
 function TelaInicial({ navigation }: Props) {
@@ -1114,6 +1270,7 @@ function TelaInicial({ navigation }: Props) {
     <View style={{ padding: 16 }}>
       <TouchableOpacity
         onPress={() =>
+          // navigate: abre a tela e passa os parâmetros
           navigation.navigate('TelaDetalhe', { itemId: 42, titulo: 'Produto Incrível' })
         }
       >
@@ -1126,6 +1283,7 @@ function TelaInicial({ navigation }: Props) {
 type DetalheProps = NativeStackScreenProps<RootStackParams, 'TelaDetalhe'>;
 
 function TelaDetalhe({ navigation, route }: DetalheProps) {
+  // route.params contém os dados passados pela tela anterior
   const { itemId, titulo } = route.params;
 
   return (
@@ -1140,20 +1298,31 @@ function TelaDetalhe({ navigation, route }: DetalheProps) {
 }
 ```
 
+**Métodos de navegação disponíveis:**
+
+| Método | O que faz |
+|---|---|
+| `navigation.navigate('NomeDaTela', params)` | Abre a tela ou vai para ela se já existir na pilha |
+| `navigation.push('NomeDaTela', params)` | Sempre empilha uma nova instância da tela |
+| `navigation.goBack()` | Volta para a tela anterior |
+| `navigation.popToTop()` | Volta para a tela raiz da pilha |
+| `navigation.replace('NomeDaTela')` | Substitui a tela atual sem adicionar ao histórico |
+
 ---
 
-### 7.4 Bottom Tab Navigator — navegação por abas
+### 7.4 Bottom Tab Navigator
 
 ```tsx
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-const Tab = createBottomTabNavigator<TabParams>();
+const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        // tabBarIcon: define o ícone de cada aba
         tabBarIcon: ({ focused, color, size }) => {
           const icones = {
             Inicio: focused ? 'home' : 'home-outline',
@@ -1162,8 +1331,8 @@ function TabNavigator() {
           };
           return <Ionicons name={icones[route.name]} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: '#007AFF',   // cor do item ativo
+        tabBarInactiveTintColor: 'gray',    // cor dos itens inativos
       })}
     >
       <Tab.Screen name="Inicio" component={TelaInicio} options={{ title: 'Início' }} />
@@ -1176,13 +1345,15 @@ function TabNavigator() {
 
 ---
 
-### 7.5 Navegação aninhada — Stack dentro de Tab
+### 7.5 Navegação aninhada
 
 ```tsx
+// Estrutura comum: abas que têm suas próprias pilhas de navegação
 function AppNavigator() {
   return (
     <NavigationContainer>
       <Tab.Navigator>
+        {/* Cada aba é um Stack Navigator independente */}
         <Tab.Screen name="InicioTab" component={InicioStackNavigator} />
         <Tab.Screen name="PerfilTab" component={PerfilStack} />
       </Tab.Navigator>
@@ -1190,6 +1361,7 @@ function AppNavigator() {
   );
 }
 
+// Stack da aba "Início"
 const InicioStack = createNativeStackNavigator();
 function InicioStackNavigator() {
   return (
@@ -1207,34 +1379,23 @@ function InicioStackNavigator() {
 
 ---
 
-### 8.1 Quando o estado local não basta
+### 8.1 Context API
 
-O `useState` dentro de um componente é suficiente para estados locais. Mas quando múltiplas telas precisam do mesmo dado — como informações do usuário logado, carrinho de compras, configurações — o estado precisa ser **global**.
-
----
-
-### 8.2 Context API — estado global nativo do React
+Quando múltiplas telas precisam do mesmo dado (usuário logado, carrinho de compras, tema), o estado precisa ser **global**.
 
 ```tsx
 // contexts/AuthContext.tsx
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
 
-interface Usuario { id: number; nome: string; email: string; }
+// 1. Criar o contexto com o tipo dos dados
+const AuthContext = createContext(null);
 
-interface AuthContextType {
-  usuario: Usuario | null;
-  fazerLogin: (email: string, senha: string) => Promise<void>;
-  fazerLogout: () => void;
-  carregando: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
+// 2. Provider: envolve o app e fornece os dados para todos os filhos
+export function AuthProvider({ children }) {
+  const [usuario, setUsuario] = useState(null);
   const [carregando, setCarregando] = useState(false);
 
-  async function fazerLogin(email: string, senha: string) {
+  async function fazerLogin(email, senha) {
     setCarregando(true);
     try {
       const resposta = await api.login(email, senha);
@@ -1253,6 +1414,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// 3. Hook customizado para consumir o contexto com verificação de segurança
 export function useAuth() {
   const contexto = useContext(AuthContext);
   if (!contexto) throw new Error('useAuth deve ser usado dentro de AuthProvider');
@@ -1260,9 +1422,28 @@ export function useAuth() {
 }
 ```
 
+```tsx
+// App.tsx — envolver o app com o Provider
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
+  );
+}
+
+// Em qualquer tela dentro do Provider:
+function TelaHome() {
+  const { usuario, fazerLogout } = useAuth();
+  return <Text>Bem-vindo, {usuario?.nome}</Text>;
+}
+```
+
 ---
 
-### 8.3 Zustand — gerenciamento de estado leve e moderno
+### 8.2 Zustand
+
+Zustand é uma biblioteca de estado global moderna, com menos código que Redux e sem a verbosidade do Context API para estados complexos.
 
 ```bash
 npm install zustand
@@ -1272,37 +1453,21 @@ npm install zustand
 // stores/useCarrinhoStore.ts
 import { create } from 'zustand';
 
-interface Produto { id: number; nome: string; preco: number; quantidade: number; }
-
-interface CarrinhoStore {
-  itens: Produto[];
-  totalItens: number;
-  totalPreco: number;
-  adicionarItem: (produto: Omit<Produto, 'quantidade'>) => void;
-  removerItem: (id: number) => void;
-  limparCarrinho: () => void;
-}
-
-export const useCarrinhoStore = create<CarrinhoStore>((set, get) => ({
+// create() define o estado e as ações em um único objeto
+export const useCarrinhoStore = create((set, get) => ({
   itens: [],
   totalItens: 0,
   totalPreco: 0,
 
+  // Ação: adiciona um produto ou incrementa a quantidade se já existir
   adicionarItem: (produto) => {
-    const itensAtuais = get().itens;
+    const itensAtuais = get().itens; // get() acessa o estado atual
     const itemExistente = itensAtuais.find(i => i.id === produto.id);
     const novosItens = itemExistente
       ? itensAtuais.map(i => i.id === produto.id ? { ...i, quantidade: i.quantidade + 1 } : i)
       : [...itensAtuais, { ...produto, quantidade: 1 }];
-    set({
-      itens: novosItens,
-      totalItens: novosItens.reduce((acc, i) => acc + i.quantidade, 0),
-      totalPreco: novosItens.reduce((acc, i) => acc + i.preco * i.quantidade, 0),
-    });
-  },
 
-  removerItem: (id) => {
-    const novosItens = get().itens.filter(i => i.id !== id);
+    // set() atualiza o estado — mescla com o estado atual automaticamente
     set({
       itens: novosItens,
       totalItens: novosItens.reduce((acc, i) => acc + i.quantidade, 0),
@@ -1312,9 +1477,13 @@ export const useCarrinhoStore = create<CarrinhoStore>((set, get) => ({
 
   limparCarrinho: () => set({ itens: [], totalItens: 0, totalPreco: 0 }),
 }));
-```
 
-**Comparativo de bibliotecas de estado global:**
+// Uso em qualquer componente — sem Provider, sem Context:
+function BotaoCarrinho() {
+  const { totalItens, adicionarItem } = useCarrinhoStore();
+  return <Text>Carrinho: {totalItens}</Text>;
+}
+```
 
 | Biblioteca | Verbosidade | Curva de aprendizado | Quando usar |
 |---|---|---|---|
@@ -1322,7 +1491,6 @@ export const useCarrinhoStore = create<CarrinhoStore>((set, get) => ({
 | `Zustand` | Baixa | Baixa | Estado global de média complexidade |
 | `Redux Toolkit` | Alta | Alta | Apps enterprise, equipes grandes |
 | `Jotai` | Muito baixa | Baixa | Estado atômico e granular |
-| `Recoil` | Baixa | Média | Apps com estado derivado complexo |
 
 ---
 
@@ -1330,10 +1498,13 @@ export const useCarrinhoStore = create<CarrinhoStore>((set, get) => ({
 
 ---
 
-### 9.1 Fetch API nativa
+### 9.1 Fetch nativo
+
+A API `fetch` está disponível nativamente no React Native — sem instalação adicional.
 
 ```tsx
-async function buscarUsuarios(): Promise<Usuario[]> {
+// GET — buscar dados
+async function buscarUsuarios() {
   const resposta = await fetch('https://api.exemplo.com/usuarios', {
     method: 'GET',
     headers: {
@@ -1342,15 +1513,17 @@ async function buscarUsuarios(): Promise<Usuario[]> {
     },
   });
 
+  // Verificar se a resposta foi bem-sucedida antes de parsear
   if (!resposta.ok) throw new Error(`Erro HTTP: ${resposta.status}`);
   return resposta.json();
 }
 
-async function criarTarefa(titulo: string): Promise<Tarefa> {
+// POST — enviar dados
+async function criarTarefa(titulo) {
   const resposta = await fetch('https://api.exemplo.com/tarefas', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ titulo, concluida: false }),
+    body: JSON.stringify({ titulo, concluida: false }), // objeto → string JSON
   });
   return resposta.json();
 }
@@ -1358,45 +1531,49 @@ async function criarTarefa(titulo: string): Promise<Tarefa> {
 
 ---
 
-### 9.2 Axios — cliente HTTP com mais recursos
+### 9.2 Axios
+
+Axios é um cliente HTTP com recursos adicionais como interceptors, timeout e cancelamento.
 
 ```bash
 npm install axios
 ```
 
 ```tsx
-// services/api.ts
+// services/api.ts — instância configurada do Axios
 import axios from 'axios';
 
 export const api = axios.create({
   baseURL: 'https://api.exemplo.com',
-  timeout: 10000,
+  timeout: 10000,                            // timeout de 10 segundos
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Interceptor de requisição — adiciona token automaticamente
+// Interceptor de requisição — adiciona token em TODAS as requisições automaticamente
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Interceptor de resposta — trata erros globalmente
+// Interceptor de resposta — trata erros 401 globalmente (sessão expirada)
 api.interceptors.response.use(
-  (resposta) => resposta,
+  (resposta) => resposta, // sucesso: passa adiante sem modificar
   async (erro) => {
     if (erro.response?.status === 401) {
       await AsyncStorage.removeItem('token');
       navigation.navigate('Login');
     }
-    return Promise.reject(erro);
+    return Promise.reject(erro); // repassa o erro para o catch() do chamador
   }
 );
 ```
 
 ---
 
-### 9.3 TanStack Query (React Query) — o padrão moderno
+### 9.3 TanStack Query
+
+TanStack Query (anteriormente React Query) é o padrão moderno para requisições HTTP. Gerencia automaticamente cache, estados de loading/error e revalidação.
 
 ```bash
 npm install @tanstack/react-query
@@ -1405,12 +1582,17 @@ npm install @tanstack/react-query
 ```tsx
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+// QueryClient configura o comportamento padrão de todas as queries
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 5 * 60 * 1000, retry: 2 },
+    queries: {
+      staleTime: 5 * 60 * 1000, // dados ficam "frescos" por 5 minutos
+      retry: 2,                   // tenta novamente 2x em caso de erro
+    },
   },
 });
 
+// QueryClientProvider envolve o app — vai em App.tsx junto com NavigationContainer
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -1419,10 +1601,11 @@ export default function App() {
   );
 }
 
+// useQuery: busca e mantém dados em cache
 function TelaProdutos() {
   const { data: produtos, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['produtos'],
-    queryFn: () => api.get('/produtos').then(r => r.data),
+    queryKey: ['produtos'],           // chave única para identificar o cache
+    queryFn: () => api.get('/produtos').then(r => r.data), // função que busca os dados
   });
 
   if (isLoading) return <ActivityIndicator />;
@@ -1439,12 +1622,14 @@ function TelaProdutos() {
   );
 }
 
+// useMutation: para POST/PUT/DELETE — invalida o cache após sucesso
 function FormularioTarefa() {
   const queryClient = useQueryClient();
 
   const criarTarefaMutation = useMutation({
-    mutationFn: (novaTarefa: { titulo: string }) => api.post('/tarefas', novaTarefa),
+    mutationFn: (novaTarefa) => api.post('/tarefas', novaTarefa),
     onSuccess: () => {
+      // Invalida o cache das tarefas → força recarregamento automático
       queryClient.invalidateQueries({ queryKey: ['tarefas'] });
     },
   });
@@ -1460,38 +1645,251 @@ function FormularioTarefa() {
 }
 ```
 
-**Comparativo de abordagens para requisições HTTP:**
-
-| Abordagem | Cache automático | Loading state | Refetch | Paginação | Complexidade |
-|---|---|---|---|---|---|
-| `fetch` nativo | ❌ | Manual | Manual | Manual | Baixa |
-| `Axios` | ❌ | Manual | Manual | Manual | Baixa |
-| `TanStack Query` | ✅ | Automático | Automático | Automático | Média |
-| `SWR` | ✅ | Automático | Automático | Parcial | Baixa |
+| Abordagem | Cache automático | Loading state | Refetch automático | Complexidade |
+|---|---|---|---|---|
+| `fetch` nativo | ❌ | Manual | Manual | Baixa |
+| `Axios` | ❌ | Manual | Manual | Baixa |
+| `TanStack Query` | ✅ | Automático | Automático | Média |
 
 ---
 
-## Parte 10 — Componentes de UI — Bibliotecas e Templates
+## Parte 10 — Persistência de Dados
 
 ---
 
-### 10.1 Onde encontrar templates e componentes prontos?
+### 10.1 AsyncStorage
 
-| Recurso | URL | O que oferece |
+AsyncStorage é o equivalente ao `SharedPreferences` do Android — armazena pares chave/valor do tipo string que persistem mesmo após o app ser fechado.
+
+```bash
+npx expo install @react-native-async-storage/async-storage
+```
+
+```tsx
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Salvar string simples
+await AsyncStorage.setItem('tema', 'escuro');
+
+// Salvar objeto — deve ser convertido para JSON string antes
+const usuario = { id: 1, nome: 'Ana' };
+await AsyncStorage.setItem('usuario', JSON.stringify(usuario));
+
+// Recuperar string simples
+const tema = await AsyncStorage.getItem('tema');
+
+// Recuperar objeto — deve ser convertido de volta com JSON.parse
+const usuarioStr = await AsyncStorage.getItem('usuario');
+const usuarioRecuperado = usuarioStr ? JSON.parse(usuarioStr) : null;
+
+// Remover item específico
+await AsyncStorage.removeItem('tema');
+
+// Limpar tudo (use com cautela)
+await AsyncStorage.clear();
+```
+
+> **Segurança:** AsyncStorage **não é criptografado**. Para dados sensíveis como tokens, use `react-native-keychain` ou `expo-secure-store`.
+
+---
+
+### 10.2 MMKV
+
+MMKV é uma alternativa ao AsyncStorage com performance muito superior — é **síncrona** (sem await).
+
+```bash
+npm install react-native-mmkv
+```
+
+```tsx
+import { MMKV } from 'react-native-mmkv';
+
+const storage = new MMKV();
+
+// MMKV é SÍNCRONO — sem await, sem try/catch obrigatório
+storage.set('token', 'meu-jwt-token');
+storage.set('contador', 42);
+
+const token = storage.getString('token');    // string | undefined
+const contador = storage.getNumber('contador'); // number | undefined
+
+storage.delete('token');
+```
+
+| | AsyncStorage | MMKV |
 |---|---|---|
-| **React Native Elements** | `rneui.org` | Biblioteca de UI completa, Material-inspired |
-| **NativeBase / GlueStack** | `gluestack.io` | Componentes modernos, design system completo |
-| **React Native Paper** | `callstack.github.io/react-native-paper` | Material Design 3 para React Native |
-| **UI Kitten** | `akveo.github.io/react-native-ui-kitten` | Design system customizável |
-| **Expo Snack** | `snack.expo.dev` | IDE online para testar componentes |
-| **React Native Directory** | `reactnative.directory` | Catálogo de todas as libs da comunidade |
-| **Nativewind Components** | `nativewind.dev` | Tailwind CSS para React Native |
-| **Tamagui** | `tamagui.dev` | UI kit cross-platform de alta performance |
-| **Shopify Restyle** | GitHub Shopify/restyle | Design system da Shopify |
+| Tipo | Assíncrono (Promise) | Síncrono |
+| Performance | Boa | Muito superior |
+| Criptografia | Não | Sim (com configuração) |
+| Tamanho máximo | Sem limite definido | Sem limite definido |
 
 ---
 
-### 10.2 React Native Paper — Material Design 3
+### 10.3 SQLite com expo-sqlite
+
+SQLite é um banco de dados relacional local, embutido no dispositivo. Recomendado quando os dados têm estrutura tabular e relacionamentos.
+
+```bash
+npx expo install expo-sqlite
+```
+
+```tsx
+import * as SQLite from 'expo-sqlite';
+
+// SQL de criação da tabela — IF NOT EXISTS evita erro se já existir
+const SQL_CREATE_USUARIOS = `
+  CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY autoincrement,
+    name varchar(255) NOT NULL,
+    email varchar(255) NOT NULL
+  )
+`;
+
+// db.js — arquivo centralizado de conexão (recomendado)
+// Importar este arquivo em qualquer tela que precise do banco
+let _db = null;
+
+export default function openDB() {
+  if (!_db) {
+    _db = SQLite.openDatabaseSync('meuApp.sqlite');
+    // Na primeira conexão, criar as tabelas se não existirem
+    _db.withTransactionSync(() => {
+      _db.execSync(SQL_CREATE_USUARIOS);
+    });
+  }
+  return _db;
+}
+```
+
+```tsx
+// Uso em qualquer tela
+import openDB from './db';
+
+const db = openDB();
+
+function MinhaTelaComBancoDados() {
+  useEffect(() => {
+    // getAllSync: retorna todas as linhas do SELECT
+    const rows = db.getAllSync('SELECT * FROM usuarios', []);
+    console.log(rows);
+  }, []);
+
+  async function inserirUsuario(nome, email) {
+    // runAsync: INSERT, UPDATE, DELETE — retorna o ID inserido
+    const resultado = await db.runAsync(
+      'INSERT INTO usuarios (name, email) VALUES (?, ?)',
+      [nome, email]  // parâmetros preparados — previnem SQL injection
+    );
+    console.log('ID inserido:', resultado.lastInsertRowId);
+  }
+}
+```
+
+**Métodos disponíveis no expo-sqlite:**
+
+| Método | O que faz | Síncrono? |
+|---|---|---|
+| `db.execSync(sql)` | Executa SQL sem retorno | ✅ |
+| `db.runSync(sql, params)` | INSERT/UPDATE/DELETE — retorna lastInsertRowId | ✅ |
+| `db.getAllSync(sql, params)` | SELECT — retorna array de rows | ✅ |
+| `db.execAsync(sql)` | Versão assíncrona de execSync | ❌ |
+| `db.runAsync(sql, params)` | Versão assíncrona de runSync | ❌ |
+| `db.getAllAsync(sql, params)` | Versão assíncrona de getAllSync | ❌ |
+
+---
+
+## Parte 11 — Permissões
+
+---
+
+### 11.1 Por que permissões existem
+
+Por padrão, nenhum app tem permissão de acessar dados privados do usuário (câmera, galeria, localização, contatos, SMS) ou recursos que consomem bateria. Tanto Android quanto iOS exigem que o app solicite permissão explicitamente ao usuário antes de usar cada recurso.
+
+No Expo, cada módulo possui seu próprio método de solicitação de permissão — não é necessário gerenciar manualmente o arquivo `AndroidManifest.xml` na maioria dos casos.
+
+---
+
+### 11.2 Câmera e Galeria
+
+```bash
+npx expo install expo-image-picker
+```
+
+```tsx
+import * as ImagePicker from 'expo-image-picker';
+
+async function selecionarDaGaleria() {
+  // Passo 1: solicitar permissão — abre o diálogo nativo do SO
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permissão necessária para acessar a galeria');
+    return;
+  }
+
+  // Passo 2: abrir o seletor de imagens
+  const resultado = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,  // permite recorte antes de confirmar
+    aspect: [1, 1],       // proporção do recorte
+    quality: 0.8,         // compressão (0 a 1)
+  });
+
+  // Passo 3: usar a imagem selecionada (canceled = true se o usuário cancelou)
+  if (!resultado.canceled) {
+    const uri = resultado.assets[0].uri;
+    // Usar o URI local da imagem
+  }
+}
+
+async function tirarFoto() {
+  const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  if (status !== 'granted') return;
+
+  const resultado = await ImagePicker.launchCameraAsync({ quality: 0.8 });
+  if (!resultado.canceled) {
+    const uri = resultado.assets[0].uri;
+  }
+}
+```
+
+---
+
+### 11.3 Localização
+
+```bash
+npx expo install expo-location
+```
+
+```tsx
+import * as Location from 'expo-location';
+
+async function obterLocalizacao() {
+  // requestForegroundPermissionsAsync: permissão para uso enquanto o app está aberto
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    Alert.alert('Permissão de localização negada');
+    return;
+  }
+
+  const localizacao = await Location.getCurrentPositionAsync({
+    accuracy: Location.Accuracy.High,
+  });
+
+  console.log('Latitude:', localizacao.coords.latitude);
+  console.log('Longitude:', localizacao.coords.longitude);
+}
+```
+
+---
+
+## Parte 12 — Frameworks de UI e Ícones
+
+---
+
+### 12.1 React Native Paper
+
+React Native Paper implementa o Material Design 3 para React Native.
 
 ```bash
 npm install react-native-paper react-native-vector-icons
@@ -1500,6 +1898,7 @@ npm install react-native-paper react-native-vector-icons
 ```tsx
 import { Provider as PaperProvider, Button, TextInput, Card, Appbar } from 'react-native-paper';
 
+// Envolver o app com PaperProvider em App.tsx
 export default function App() {
   return (
     <PaperProvider>
@@ -1508,17 +1907,22 @@ export default function App() {
   );
 }
 
-function TelaCadastro() {
+function TelaCadastro({ navigation }) {
   const [nome, setNome] = useState('');
   return (
-    <View style={{ padding: 16 }}>
+    <View>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title="Cadastro" />
       </Appbar.Header>
       <Card style={{ margin: 16 }}>
         <Card.Content>
-          <TextInput label="Nome" value={nome} onChangeText={setNome} mode="outlined" />
+          <TextInput
+            label="Nome"
+            value={nome}
+            onChangeText={setNome}
+            mode="outlined"
+          />
           <Button mode="contained" onPress={() => salvar()} style={{ marginTop: 16 }}>
             Salvar
           </Button>
@@ -1531,7 +1935,9 @@ function TelaCadastro() {
 
 ---
 
-### 10.3 NativeWind — Tailwind CSS para React Native
+### 12.2 NativeWind
+
+NativeWind permite usar classes Tailwind CSS no React Native.
 
 ```bash
 npm install nativewind
@@ -1540,6 +1946,7 @@ npx tailwindcss init
 ```
 
 ```tsx
+// Com NativeWind, estilização via className (igual ao Tailwind na web)
 function CartaoPerfil({ nome, cargo, avatar }) {
   return (
     <View className="flex-row items-center p-4 bg-white rounded-xl shadow-md m-4">
@@ -1558,11 +1965,14 @@ function CartaoPerfil({ nome, cargo, avatar }) {
 
 ---
 
-### 10.4 Ícones
+### 12.3 Ícones
 
 ```bash
-# Expo (pré-instalado)  →  @expo/vector-icons
-# React Native CLI      →  npm install react-native-vector-icons
+# Expo (já incluso):
+# @expo/vector-icons
+
+# React Native CLI:
+npm install react-native-vector-icons
 ```
 
 ```tsx
@@ -1579,33 +1989,38 @@ function BarraNavegacao() {
 }
 ```
 
-| Família | Quantidade | Estilo |
+| Família | Quantidade de ícones | Estilo |
 |---|---|---|
 | `Ionicons` | ~1300 | iOS / Android |
 | `MaterialIcons` | ~1000 | Material Design |
 | `FontAwesome5` | ~1500 | Web clássico |
 | `Feather` | ~280 | Minimalista |
-| `AntDesign` | ~298 | Ant Design |
 
 ---
 
-## Parte 11 — Animações
+## Parte 13 — Animações
 
 ---
 
-### 11.1 Animated API — animações nativas
+### 13.1 Animated API
+
+A Animated API é nativa do React Native e não requer instalação adicional.
 
 ```tsx
 import { Animated, TouchableOpacity, View, Text } from 'react-native';
 import { useRef } from 'react';
 
 function BotaoAnimado() {
+  // useRef mantém a referência do valor animado entre re-renders
   const escala = useRef(new Animated.Value(1)).current;
   const opacidade = useRef(new Animated.Value(1)).current;
 
   function aoPresionar() {
+    // Animated.parallel executa múltiplas animações simultaneamente
     Animated.parallel([
+      // spring: animação com física (elasticidade)
       Animated.spring(escala, { toValue: 0.95, useNativeDriver: true }),
+      // timing: animação linear com duração definida
       Animated.timing(opacidade, { toValue: 0.7, duration: 100, useNativeDriver: true }),
     ]).start();
   }
@@ -1618,6 +2033,7 @@ function BotaoAnimado() {
   }
 
   return (
+    // Animated.View é o componente que aceita valores animados no style
     <Animated.View style={{ transform: [{ scale: escala }], opacity: opacidade }}>
       <TouchableOpacity
         onPressIn={aoPresionar}
@@ -1633,20 +2049,28 @@ function BotaoAnimado() {
 
 ---
 
-### 11.2 Reanimated 3 — animações de alta performance
+### 13.2 Reanimated 3
+
+Reanimated 3 executa animações diretamente na thread nativa de UI, garantindo 60fps mesmo com carga na thread JavaScript.
 
 ```bash
 npm install react-native-reanimated
 ```
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
 
 function CartaoAnimado() {
+  // useSharedValue: valor que vive na thread nativa — sem Bridge
   const translateX = useSharedValue(0);
   const rotacao = useSharedValue(0);
 
-  // useAnimatedStyle cria um estilo reativo que roda na thread da UI
+  // useAnimatedStyle: estilo reativo que roda na thread de UI, não na JS thread
   const estilo = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
@@ -1656,10 +2080,17 @@ function CartaoAnimado() {
 
   return (
     <Animated.View style={[styles.cartao, estilo]}>
-      <TouchableOpacity onPress={() => { translateX.value = withSpring(100); rotacao.value = withTiming(15); }}>
+      <TouchableOpacity onPress={() => {
+        // withSpring / withTiming: animações declarativas
+        translateX.value = withSpring(100);
+        rotacao.value = withTiming(15);
+      }}>
         <Text>Animar</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => { translateX.value = withSpring(0); rotacao.value = withTiming(0); }}>
+      <TouchableOpacity onPress={() => {
+        translateX.value = withSpring(0);
+        rotacao.value = withTiming(0);
+      }}>
         <Text>Resetar</Text>
       </TouchableOpacity>
     </Animated.View>
@@ -1669,7 +2100,9 @@ function CartaoAnimado() {
 
 ---
 
-### 11.3 Lottie — animações vetoriais
+### 13.3 Lottie
+
+Lottie renderiza animações vetoriais criadas no Adobe After Effects.
 
 ```bash
 npm install lottie-react-native
@@ -1681,92 +2114,29 @@ import LottieView from 'lottie-react-native';
 function AnimacaoCarregamento() {
   return (
     <LottieView
-      source={require('./assets/loading.json')}
-      autoPlay
-      loop
+      source={require('./assets/loading.json')} // arquivo JSON exportado do After Effects
+      autoPlay    // inicia automaticamente
+      loop        // repete indefinidamente
       style={{ width: 200, height: 200 }}
     />
   );
 }
 ```
 
-Sites para baixar animações: [lottiefiles.com](https://lottiefiles.com) e [lordicon.com](https://lordicon.com).
+Sites para baixar animações Lottie gratuitas: [lottiefiles.com](https://lottiefiles.com) e [lordicon.com](https://lordicon.com).
 
 ---
 
-## Parte 12 — Armazenamento Local
+## Parte 14 — TypeScript no React Native
+
+TypeScript é o padrão do ecossistema React Native. O `create-expo-app` já gera projetos TypeScript por padrão.
 
 ---
 
-### 12.1 AsyncStorage
-
-```bash
-npm install @react-native-async-storage/async-storage
-```
+### 14.1 Tipagem de componentes e props
 
 ```tsx
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-await AsyncStorage.setItem('tema', 'escuro');
-await AsyncStorage.setItem('usuario', JSON.stringify({ id: 1, nome: 'Ana' }));
-
-const tema = await AsyncStorage.getItem('tema');
-const usuarioStr = await AsyncStorage.getItem('usuario');
-const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
-
-await AsyncStorage.removeItem('tema');
-await AsyncStorage.clear();
-```
-
-> ⚠️ AsyncStorage **não é criptografado**. Para dados sensíveis use `react-native-keychain` ou `expo-secure-store`.
-
----
-
-### 12.2 MMKV — armazenamento de alta performance
-
-```bash
-npm install react-native-mmkv
-```
-
-```tsx
-import { MMKV } from 'react-native-mmkv';
-
-const storage = new MMKV();
-
-// MMKV é SÍNCRONO — não precisa de await
-storage.set('token', 'meu-jwt-token');
-storage.set('contador', 42);
-
-const token = storage.getString('token');
-const contador = storage.getNumber('contador');
-
-storage.delete('token');
-```
-
----
-
-### 12.3 WatermelonDB — banco de dados relacional local
-
-```bash
-npm install @nozbe/watermelondb
-```
-
-WatermelonDB é o equivalente mobile do Room: modelos, relacionamentos, migrações e queries reativas. É a escolha para apps offline-first com sincronização.
-
----
-
-## Parte 13 — TypeScript no React Native
-
-TypeScript é o padrão do ecossistema React Native. O `create-expo-app` já gera projetos TypeScript por padrão. Esta parte cobre os padrões de tipagem específicos para React Native.
-
----
-
-### 13.1 Tipagem de componentes e props
-
-A forma mais clara de documentar o contrato de um componente é declarar uma `interface` para suas props.
-
-```tsx
-// Interface de props — documenta o que o componente aceita
+// Interface declara o contrato do componente — o que ele aceita e o que é obrigatório
 interface CardProdutoProps {
   produto: {
     id: number;
@@ -1775,8 +2145,8 @@ interface CardProdutoProps {
     imagem: string;
     disponivel: boolean;
   };
-  onPress: (id: number) => void;  // callback tipado
-  destaque?: boolean;              // prop opcional — o '?' indica que tem valor padrão
+  onPress: (id: number) => void;  // callback tipado — obrigatório
+  destaque?: boolean;              // ? = prop opcional (tem valor padrão)
 }
 
 function CardProduto({ produto, onPress, destaque = false }: CardProdutoProps) {
@@ -1798,9 +2168,7 @@ function CardProduto({ produto, onPress, destaque = false }: CardProdutoProps) {
 
 ---
 
-### 13.2 Utility Types — transformando tipos existentes
-
-O TypeScript fornece utility types que evitam duplicação de código ao derivar novos tipos de tipos já existentes.
+### 14.2 Utility Types
 
 ```tsx
 interface Produto {
@@ -1811,70 +2179,51 @@ interface Produto {
   estoque: number;
 }
 
-// Partial<T> — torna todos os campos opcionais
-// Uso: payload de atualização parcial (PATCH)
+// Partial<T>: todos os campos ficam opcionais — útil para payload de PATCH
 type AtualizacaoProduto = Partial<Produto>;
 // { id?: number; nome?: string; preco?: number; ... }
 
-// Pick<T, K> — seleciona apenas os campos listados
-// Uso: exibir apenas o resumo em um card de lista
+// Pick<T, K>: seleciona apenas os campos listados — útil para listagens
 type ResumoProduto = Pick<Produto, 'id' | 'nome' | 'preco'>;
 // { id: number; nome: string; preco: number }
 
-// Omit<T, K> — remove os campos listados
-// Uso: payload de criação (o id é gerado pelo servidor)
+// Omit<T, K>: remove os campos listados — útil para payload de POST (id gerado pelo servidor)
 type NovoProduto = Omit<Produto, 'id'>;
 // { nome: string; preco: number; categoria: string; estoque: number }
 
-// Required<T> — torna todos os campos obrigatórios (inverso de Partial)
-type ProdutoCompleto = Required<Produto>;
-
-// Readonly<T> — impede modificação dos campos após criação
+// Readonly<T>: impede modificação dos campos após criação
 type ProdutoImutavel = Readonly<Produto>;
 ```
 
 ---
 
-### 13.3 Tipagem de navegação com React Navigation
-
-Tipar as rotas elimina erros de digitação nos nomes de telas e nos parâmetros passados.
+### 14.3 Tipagem de navegação
 
 ```tsx
-// navigation/types.ts — definição central de todas as rotas
-
+// navigation/types.ts — centraliza os tipos de todas as rotas
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-// Stack principal
 export type RootStackParams = {
-  Login: undefined;                            // sem parâmetros
+  Login: undefined;                               // sem parâmetros
   Home: undefined;
-  Detalhe: { produtoId: number; titulo: string }; // com parâmetros obrigatórios
+  Detalhe: { produtoId: number; titulo: string }; // parâmetros obrigatórios
   Editar: { produtoId: number };
-};
-
-// Abas inferiores
-export type TabParams = {
-  Inicio: undefined;
-  Busca: { termoPadrao?: string };             // parâmetro opcional
-  Perfil: undefined;
 };
 
 // Tipos prontos para usar em cada tela
 export type LoginScreenProps   = NativeStackScreenProps<RootStackParams, 'Login'>;
 export type DetalheScreenProps = NativeStackScreenProps<RootStackParams, 'Detalhe'>;
-export type BuscaTabProps      = BottomTabScreenProps<TabParams, 'Busca'>;
 ```
 
 ```tsx
-// screens/Detalhe.tsx — usando os tipos definidos
+// screens/Detalhe.tsx
 import { DetalheScreenProps } from '../navigation/types';
 
 function TelaDetalhe({ navigation, route }: DetalheScreenProps) {
   // TypeScript sabe exatamente quais campos existem em route.params
   const { produtoId, titulo } = route.params;
-  // produtoId: number — TypeScript valida o tipo
-  // titulo: string    — TypeScript valida o tipo
+  // produtoId: number — TypeScript valida
+  // titulo: string    — TypeScript valida
 
   return (
     <View>
@@ -1889,17 +2238,15 @@ function TelaDetalhe({ navigation, route }: DetalheScreenProps) {
 
 ---
 
-### 13.4 Tipagem de estado e hooks
+### 14.4 Tipagem de estado e hooks
 
 ```tsx
-// Estado com tipo explícito — útil quando o tipo inicial é null
+// Estado com tipo explícito — necessário quando o valor inicial é null
 const [usuario, setUsuario] = useState<Usuario | null>(null);
 const [produtos, setProdutos] = useState<Produto[]>([]);
-const [carregando, setCarregando] = useState<boolean>(false);
 
-// useRef tipado
+// useRef tipado — útil para referenciar componentes nativos
 const inputRef = useRef<TextInput>(null);
-const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
 // useReducer para estado complexo
 type Estado = {
@@ -1926,82 +2273,43 @@ const [estado, dispatch] = useReducer(reducer, { itens: [], carregando: false, e
 
 ---
 
-### 13.5 Configuração do tsconfig.json para React Native
-
-```json
-{
-  "extends": "@tsconfig/react-native/tsconfig.json",
-  "compilerOptions": {
-    "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@components/*": ["src/components/*"],
-      "@screens/*":    ["src/screens/*"],
-      "@hooks/*":      ["src/hooks/*"],
-      "@services/*":   ["src/services/*"],
-      "@stores/*":     ["src/stores/*"],
-      "@types/*":      ["src/types/*"]
-    }
-  }
-}
-```
-
-O campo `paths` habilita **path aliases** — substitui `'../../../components/Button'` por `'@components/Button'`, eliminando imports com múltiplos `../`.
+## Parte 15 — Performance e Otimização
 
 ---
 
-## Parte 14 — Performance e Otimização
-
----
-
-### 14.1 React.memo — evitando re-renders desnecessários
+### 15.1 React.memo
 
 Por padrão, quando um componente pai re-renderiza, **todos os filhos re-renderizam também**, mesmo que suas props não tenham mudado. `React.memo` memoriza o componente e só o re-renderiza se suas props mudarem.
 
 ```tsx
 // Sem React.memo — re-renderiza sempre que o pai re-renderiza
-function ItemLista({ titulo, onPress }: { titulo: string; onPress: () => void }) {
+function ItemLista({ titulo, onPress }) {
   console.log('Renderizando:', titulo);
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <Text>{titulo}</Text>
-    </TouchableOpacity>
-  );
+  return <TouchableOpacity onPress={onPress}><Text>{titulo}</Text></TouchableOpacity>;
 }
 
 // Com React.memo — só re-renderiza se 'titulo' ou 'onPress' mudarem
-const ItemListaMemo = React.memo(function ItemLista({
-  titulo,
-  onPress,
-}: {
-  titulo: string;
-  onPress: () => void;
-}) {
+const ItemListaMemo = React.memo(function ItemLista({ titulo, onPress }) {
   console.log('Renderizando:', titulo);
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <Text>{titulo}</Text>
-    </TouchableOpacity>
-  );
+  return <TouchableOpacity onPress={onPress}><Text>{titulo}</Text></TouchableOpacity>;
 });
 ```
 
 ---
 
-### 14.2 O problema clássico com FlatList e funções inline
+### 15.2 O problema com funções inline em FlatList
 
-Este é o erro de performance mais comum em React Native. Quando `renderItem` recebe uma função inline (criada dentro do render), ela é uma **nova referência a cada re-render** — mesmo que o código seja idêntico. O `React.memo` no item não tem efeito porque a prop `onPress` sempre parece diferente.
+Este é o erro de performance mais comum em React Native. Funções inline são recriadas a cada re-render, invalidando o `React.memo` dos filhos.
 
 ```tsx
-// ❌ Problema — função inline cria nova referência a cada render
+// ❌ Problema — função inline cria nova referência a cada render do pai
 function ListaTarefas({ tarefas, onRemover }) {
   return (
     <FlatList
       data={tarefas}
-      keyExtractor={t => t.id}
       renderItem={({ item }) => (
-        // Nova função criada a cada render de ListaTarefas
-        // React.memo no ItemTarefa não consegue otimizar
+        // Nova função () => onRemover(item.id) criada a cada render
+        // React.memo no ItemTarefa não tem efeito
         <ItemTarefa tarefa={item} onRemover={() => onRemover(item.id)} />
       )}
     />
@@ -2010,19 +2318,14 @@ function ListaTarefas({ tarefas, onRemover }) {
 
 // ✅ Solução — useCallback estabiliza a referência da função
 function ListaTarefas({ tarefas, onRemover }) {
-  // handleRemover é a MESMA referência entre renders
-  // enquanto 'onRemover' não mudar
-  const handleRemover = useCallback(
-    (id: string) => onRemover(id),
-    [onRemover]
-  );
+  // handleRemover é a MESMA referência enquanto 'onRemover' não mudar
+  const handleRemover = useCallback((id) => onRemover(id), [onRemover]);
 
   return (
     <FlatList
       data={tarefas}
-      keyExtractor={t => t.id}
-      // Agora React.memo no ItemTarefa funciona corretamente
       renderItem={({ item }) => (
+        // handleRemover é estável → React.memo funciona corretamente
         <ItemTarefa tarefa={item} onRemover={handleRemover} />
       )}
     />
@@ -2032,82 +2335,55 @@ function ListaTarefas({ tarefas, onRemover }) {
 
 ---
 
-### 14.3 Hermes — o motor JavaScript do React Native
+### 15.3 Hermes
 
-**Hermes** é o motor JavaScript desenvolvido pela Meta especificamente para React Native. É ativado por padrão desde o React Native 0.70.
-
-O que ele muda na prática:
+[Hermes](#hermes) é o motor JavaScript desenvolvido pela Meta especificamente para React Native. Ativo por padrão desde o RN 0.70.
 
 | Aspecto | JavaScriptCore (motor antigo) | Hermes |
 |---|---|---|
-| Compilação | JIT (Just-In-Time) — compila ao rodar | AOT (Ahead-Of-Time) — compila no build |
+| Compilação | JIT (Just-In-Time) | AOT (Ahead-Of-Time) — compila no build |
 | Tempo de inicialização | Mais lento | Até 2× mais rápido |
 | Consumo de memória | Maior | Menor |
 | Tamanho do bundle | Maior | Menor |
-| Debugging | Via Chrome DevTools | Via Hermes Inspector |
 
-Você não precisa configurar o Hermes — ele já está ativo. O que importa entender é que o **bytecode gerado no build** é o que o dispositivo executa, não o JavaScript fonte. Isso é parte do motivo pelo qual projetos Expo e React Native CLI têm etapas de build separadas do desenvolvimento.
-
----
-
-### 14.4 Flipper — profiling e debugging
-
-Flipper é o cliente desktop de debugging oficial do React Native.
-
-```bash
-# Instalar o Flipper Desktop: https://fbflipper.com
-# No projeto, já vem configurado no React Native CLI
-# No Expo: requer desenvolvimento build (não funciona no Expo Go)
-```
-
-O que inspecionar no Flipper para identificar problemas de performance:
-
-| Plugin do Flipper | O que mostra |
-|---|---|
-| **React DevTools** | Árvore de componentes, props, estado, re-renders |
-| **Network** | Todas as requisições HTTP com headers, body e tempo |
-| **Layout Inspector** | Hierarquia visual de Views, margens, tamanhos |
-| **Hermes Debugger** | Profiling de CPU — identifica quais funções são lentas |
-| **Crash Reporter** | Stack traces de crashes nativos |
+Você não precisa configurar o Hermes — ele já está ativo. O que importa entender: o **bytecode gerado no build** é o que o dispositivo executa, não o JavaScript fonte.
 
 ---
 
-### 14.5 Resumo das otimizações
+### 15.4 Tabela de otimizações
 
 | Técnica | O que resolve | Quando aplicar |
 |---|---|---|
-| `React.memo` | Re-renders desnecessários de componentes filhos | Componentes que recebem props estáveis |
+| `React.memo` | Re-renders desnecessários | Componentes com props estáveis |
 | `useCallback` | Instabilidade de referências de funções | Funções passadas como props, especialmente em `renderItem` |
-| `useMemo` | Recálculo de dados derivados a cada render | Filtragem, ordenação, transformação de listas grandes |
+| `useMemo` | Recálculo de dados derivados a cada render | Filtragem, ordenação, transformação de listas |
 | `keyExtractor` estável | Reconciliação errada na FlatList | Sempre — use IDs únicos, nunca índices |
 | `removeClippedSubviews` | Memória em listas muito longas | FlatLists com centenas de itens |
-| `getItemLayout` | Scroll para posição específica sem medir | Listas com altura de item conhecida e fixa |
+| `getItemLayout` | Scroll para posição sem medir | Listas com altura de item conhecida e fixa |
 
 ---
 
-## Parte 15 — Testes
+## Parte 16 — Testes
 
 ---
 
-### 15.1 Estrutura de testes no React Native
-
-O ecossistema de testes do React Native tem três camadas com responsabilidades distintas:
+### 16.1 Estrutura de testes
 
 | Camada | Ferramenta | O que testa | Velocidade |
 |---|---|---|---|
-| Unitário | Jest | Funções puras, hooks, stores Zustand | Muito rápida |
-| Componente | React Native Testing Library | Renderização e interação de componentes | Rápida |
-| E2E | Detox | Fluxos completos no dispositivo real | Lenta |
+| Unitário | Jest | Funções puras, hooks, stores | Muito rápida |
+| Componente | React Native Testing Library | Renderização e interação | Rápida |
+| E2E | Detox | Fluxos completos no dispositivo | Lenta |
 
 ---
 
-### 15.2 Jest — testes unitários
+### 16.2 Jest — testes unitários
 
-Jest é pré-configurado em todos os projetos Expo e React Native CLI. Não precisa de instalação adicional.
+Jest é pré-configurado em todos os projetos Expo e React Native CLI.
 
 ```tsx
 // utils/formatarPreco.ts
-export function formatarPreco(valor: number): string {
+export function formatarPreco(valor) {
   return `R$ ${valor.toFixed(2).replace('.', ',')}`;
 }
 
@@ -2122,17 +2398,12 @@ describe('formatarPreco', () => {
   it('formata decimal corretamente', () => {
     expect(formatarPreco(49.9)).toBe('R$ 49,90');
   });
-
-  it('formata zero corretamente', () => {
-    expect(formatarPreco(0)).toBe('R$ 0,00');
-  });
 });
 ```
 
-**Testando um custom hook com `renderHook`:**
+**Testando um custom hook:**
 
 ```tsx
-// hooks/__tests__/useContador.test.ts
 import { renderHook, act } from '@testing-library/react-native';
 import { useContador } from '../useContador';
 
@@ -2145,220 +2416,102 @@ describe('useContador', () => {
   it('incrementa corretamente', () => {
     const { result } = renderHook(() => useContador());
 
-    // act() envolve qualquer ação que muda estado
+    // act() envolve qualquer ação que causa mudança de estado
     act(() => {
       result.current.incrementar();
     });
 
     expect(result.current.valor).toBe(1);
   });
-
-  it('reseta para o valor inicial', () => {
-    const { result } = renderHook(() => useContador(10));
-
-    act(() => {
-      result.current.incrementar();
-      result.current.resetar();
-    });
-
-    expect(result.current.valor).toBe(10);
-  });
 });
 ```
 
 ---
 
-### 15.3 React Native Testing Library — testes de componentes
+### 16.3 React Native Testing Library
 
 ```bash
 npm install --save-dev @testing-library/react-native
 ```
 
-A biblioteca renderiza o componente em um ambiente simulado e permite interagir com ele como um usuário faria.
-
 ```tsx
-// components/__tests__/BotaoLogin.test.tsx
 import { render, fireEvent, screen } from '@testing-library/react-native';
 import { BotaoLogin } from '../BotaoLogin';
 
 describe('BotaoLogin', () => {
   it('renderiza o texto corretamente', () => {
     render(<BotaoLogin onPress={() => {}} />);
-
-    // getByText busca um elemento pelo texto visível
     expect(screen.getByText('Entrar')).toBeTruthy();
   });
 
   it('chama onPress quando pressionado', () => {
-    // jest.fn() cria uma função mock que registra chamadas
-    const mockOnPress = jest.fn();
+    const mockOnPress = jest.fn(); // função mock que registra chamadas
     render(<BotaoLogin onPress={mockOnPress} />);
 
-    // fireEvent.press simula um toque no elemento
-    fireEvent.press(screen.getByText('Entrar'));
+    fireEvent.press(screen.getByText('Entrar')); // simula um toque
 
     expect(mockOnPress).toHaveBeenCalledTimes(1);
   });
 
   it('fica desabilitado quando carregando', () => {
     render(<BotaoLogin onPress={() => {}} carregando={true} />);
-
-    // getByTestId busca pelo atributo testID no componente
     const botao = screen.getByTestId('botao-login');
     expect(botao.props.accessibilityState.disabled).toBe(true);
   });
 });
 ```
 
-```tsx
-// components/BotaoLogin.tsx — com testID para facilitar os testes
-interface BotaoLoginProps {
-  onPress: () => void;
-  carregando?: boolean;
-}
+---
 
-function BotaoLogin({ onPress, carregando = false }: BotaoLoginProps) {
-  return (
-    <TouchableOpacity
-      testID="botao-login"          // identificador para os testes
-      onPress={onPress}
-      disabled={carregando}
-      accessibilityState={{ disabled: carregando }}
-    >
-      {carregando ? <ActivityIndicator /> : <Text>Entrar</Text>}
-    </TouchableOpacity>
-  );
-}
-```
+## Parte 17 — Tratamento de Erros em Produção
 
 ---
 
-### 15.4 Testando componentes com estado e mocks de API
+### 17.1 Error Boundaries
 
-```tsx
-// screens/__tests__/TelaLista.test.tsx
-import { render, screen, waitFor } from '@testing-library/react-native';
-import { TelaLista } from '../TelaLista';
-
-// Mock do módulo de API — substitui a chamada real por dados controlados
-jest.mock('../../services/api', () => ({
-  api: {
-    get: jest.fn(),
-  },
-}));
-
-import { api } from '../../services/api';
-
-describe('TelaLista', () => {
-  it('exibe indicador de carregamento inicialmente', () => {
-    // A promise nunca resolve — mantém o estado de carregando
-    (api.get as jest.Mock).mockReturnValue(new Promise(() => {}));
-
-    render(<TelaLista />);
-
-    expect(screen.getByTestId('loading-indicator')).toBeTruthy();
-  });
-
-  it('exibe a lista após carregar os dados', async () => {
-    (api.get as jest.Mock).mockResolvedValue({
-      data: [
-        { id: 1, titulo: 'Tarefa A' },
-        { id: 2, titulo: 'Tarefa B' },
-      ],
-    });
-
-    render(<TelaLista />);
-
-    // waitFor aguarda o estado assíncrono se resolver
-    await waitFor(() => {
-      expect(screen.getByText('Tarefa A')).toBeTruthy();
-      expect(screen.getByText('Tarefa B')).toBeTruthy();
-    });
-  });
-
-  it('exibe mensagem de erro quando a API falha', async () => {
-    (api.get as jest.Mock).mockRejectedValue(new Error('Sem conexão'));
-
-    render(<TelaLista />);
-
-    await waitFor(() => {
-      expect(screen.getByText(/erro/i)).toBeTruthy();
-    });
-  });
-});
-```
-
----
-
-## Parte 16 — Tratamento de Erros em Produção
-
----
-
-### 16.1 Error Boundaries — capturando erros de renderização
-
-Um **Error Boundary** é um componente de classe que captura erros JavaScript que ocorrem durante a renderização de qualquer filho. Sem ele, um erro em qualquer componente da árvore derruba o app inteiro com uma tela branca.
+Um Error Boundary captura erros JavaScript durante a renderização de qualquer filho. Sem ele, um erro em qualquer componente derruba o app inteiro com tela branca.
 
 ```tsx
 // components/ErrorBoundary.tsx
-import React, { Component, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+// Deve ser um componente de CLASSE (class component) — não existe versão hook ainda
+import React, { Component } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
 
-interface Props {
-  children: ReactNode;
-  fallback?: ReactNode; // UI alternativa — opcional, tem padrão
-}
-
-interface State {
-  temErro: boolean;
-  erro: Error | null;
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  state: State = { temErro: false, erro: null };
+export class ErrorBoundary extends Component {
+  state = { temErro: false, erro: null };
 
   // Chamado quando qualquer filho lança um erro durante renderização
-  static getDerivedStateFromError(erro: Error): State {
+  static getDerivedStateFromError(erro) {
     return { temErro: true, erro };
   }
 
   // Chamado após o erro ser capturado — ideal para logar no Sentry
-  componentDidCatch(erro: Error, info: React.ErrorInfo) {
+  componentDidCatch(erro, info) {
     console.error('ErrorBoundary capturou:', erro, info.componentStack);
-    // Sentry.captureException(erro); // ver seção 16.2
   }
 
   render() {
     if (this.state.temErro) {
-      // Exibe fallback customizado ou UI padrão de erro
-      return this.props.fallback ?? (
-        <View style={styles.container}>
-          <Text style={styles.titulo}>Algo deu errado</Text>
-          <Text style={styles.descricao}>{this.state.erro?.message}</Text>
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>Algo deu errado</Text>
+          <Text style={{ color: '#666', marginBottom: 24 }}>{this.state.erro?.message}</Text>
           <TouchableOpacity
-            style={styles.botao}
+            style={{ backgroundColor: '#007AFF', padding: 16, borderRadius: 8 }}
             onPress={() => this.setState({ temErro: false, erro: null })}
           >
-            <Text style={styles.textoBotao}>Tentar novamente</Text>
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>Tentar novamente</Text>
           </TouchableOpacity>
         </View>
       );
     }
-
     return this.props.children;
   }
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  titulo: { fontSize: 20, fontWeight: 'bold', marginBottom: 8 },
-  descricao: { color: '#666', textAlign: 'center', marginBottom: 24 },
-  botao: { backgroundColor: '#007AFF', padding: 16, borderRadius: 8 },
-  textoBotao: { color: 'white', fontWeight: 'bold' },
-});
 ```
 
 ```tsx
-// App.tsx — aplicando o ErrorBoundary em diferentes níveis
+// App.tsx — aplicar em diferentes níveis de granularidade
 export default function App() {
   return (
     // Nível global — captura qualquer erro não tratado
@@ -2380,389 +2533,60 @@ function TelaCarrinho() {
 
 ---
 
-### 16.2 Sentry — monitoramento de erros em produção
+### 17.2 Sentry
 
-**Sentry** é a ferramenta padrão do mercado para capturar e monitorar erros em apps em produção. Sem ela, você não sabe que seus usuários estão encontrando erros.
+Sentry é a ferramenta padrão do mercado para capturar e monitorar erros em produção.
 
 ```bash
 npx expo install @sentry/react-native
-# ou para React Native CLI:
-npm install @sentry/react-native
-npx @sentry/react-native init
 ```
 
 ```tsx
-// App.tsx — configuração do Sentry
+// App.tsx
 import * as Sentry from '@sentry/react-native';
 
 Sentry.init({
   dsn: 'https://sua-chave@sentry.io/projeto',
-  // Envia 10% das sessões como dados de performance
-  tracesSampleRate: 0.1,
-  // Desativa em desenvolvimento para não poluir o dashboard
-  enabled: process.env.NODE_ENV === 'production',
+  tracesSampleRate: 0.1,                           // 10% das sessões como dados de performance
+  enabled: process.env.NODE_ENV === 'production',  // desativo em desenvolvimento
 });
 
 export default Sentry.wrap(App); // envolve o app para capturar erros nativos também
 ```
 
 ```tsx
-// Uso manual — capturar erros específicos com contexto
+// Captura manual com contexto
 try {
   await api.post('/pedido', dadosPedido);
 } catch (erro) {
-  // Envia o erro com contexto adicional
   Sentry.captureException(erro, {
     tags: { tela: 'Checkout', acao: 'criar_pedido' },
     extra: { usuarioId: usuario.id, totalItens: carrinho.totalItens },
   });
-
-  // Mostra mensagem amigável ao usuário
   Alert.alert('Erro', 'Não foi possível finalizar o pedido. Tente novamente.');
 }
 ```
 
 ---
 
-### 16.3 Erros não capturados — último recurso global
-
-```tsx
-// index.js — interceptar erros JavaScript não capturados por nenhum try/catch
-import { ErrorUtils } from 'react-native';
-
-const handlerOriginal = ErrorUtils.getGlobalHandler();
-
-ErrorUtils.setGlobalHandler((erro, isFatal) => {
-  // Loga o erro e repassa para o handler padrão do RN
-  console.error('Erro global não capturado:', erro);
-  // Sentry.captureException(erro);
-
-  handlerOriginal(erro, isFatal);
-});
-```
+## Parte 18 — Formulários
 
 ---
 
-## Parte 17 — Acessibilidade
+### 18.1 React Hook Form + Zod
 
----
-
-### 17.1 Por que acessibilidade importa no mobile
-
-Acessibilidade em apps mobile garante que usuários com deficiências visuais, motoras ou cognitivas possam usar o app com tecnologias assistivas como **TalkBack** (Android) e **VoiceOver** (iOS). Além do impacto para os usuários, apps nas lojas são avaliados por critérios de acessibilidade.
-
-O React Native expõe as APIs de acessibilidade nativas de iOS e Android através de props padronizadas.
-
----
-
-### 17.2 Props fundamentais de acessibilidade
-
-```tsx
-// accessibilityLabel — o que o leitor de tela anuncia ao usuário
-// Use quando o texto visível não descreve suficientemente a ação
-<TouchableOpacity
-  accessibilityLabel="Adicionar produto ao carrinho"
-  accessibilityHint="Toca duas vezes para adicionar"
-  onPress={adicionarAoCarrinho}
->
-  <Text>+</Text>
-</TouchableOpacity>
-
-// accessibilityRole — informa o tipo do elemento ao leitor de tela
-// Valores: 'button', 'link', 'header', 'image', 'checkbox', 'radio', etc.
-<TouchableOpacity
-  accessibilityRole="button"
-  accessibilityLabel="Fazer login"
-  onPress={fazerLogin}
->
-  <Text>Entrar</Text>
-</TouchableOpacity>
-
-// accessibilityState — estado atual do elemento
-<TouchableOpacity
-  accessibilityRole="checkbox"
-  accessibilityState={{ checked: marcado, disabled: desabilitado }}
-  onPress={alternarMarcacao}
->
-  <Text>{marcado ? '✓' : '○'} Aceito os termos</Text>
-</TouchableOpacity>
-
-// accessible={true} — agrupa elementos para o leitor de tela anunciar juntos
-// Sem isso, o leitor anuncia cada Text filho separadamente
-<View
-  accessible={true}
-  accessibilityLabel="Produto: Teclado Mecânico, R$ 350,00, disponível"
->
-  <Text>Teclado Mecânico</Text>
-  <Text>R$ 350,00</Text>
-  <Text>Em estoque</Text>
-</View>
-```
-
----
-
-### 17.3 Imagens e acessibilidade
-
-```tsx
-// Imagem decorativa — accessibilityElementsHidden esconde do leitor de tela
-<Image
-  source={require('./assets/decoracao.png')}
-  accessibilityElementsHidden={true}  // iOS
-  importantForAccessibility="no"      // Android
-/>
-
-// Imagem informativa — descreva o conteúdo
-<Image
-  source={{ uri: produto.imagem }}
-  accessibilityLabel={`Foto do produto: ${produto.nome}`}
-  accessible={true}
-/>
-```
-
----
-
-### 17.4 Testando acessibilidade
-
-```tsx
-// React Native Testing Library inclui queries de acessibilidade
-import { render, screen } from '@testing-library/react-native';
-
-it('botão tem label acessível correto', () => {
-  render(<BotaoAdicionar produto={produtoMock} />);
-
-  // getByRole busca por accessibilityRole
-  const botao = screen.getByRole('button', { name: /adicionar/i });
-  expect(botao).toBeTruthy();
-});
-```
-
----
-
-## Parte 18 — Build e Publicação nas Lojas
-
----
-
-### 18.1 Os três estados de um app Expo
-
-Entender as diferenças entre os ambientes de execução do Expo é fundamental antes de publicar.
-
-| Ambiente | Como rodar | O que suporta | Quando usar |
-|---|---|---|---|
-| **Expo Go** | App da loja + QR code | Apenas SDK do Expo | Aprendizado e prototipagem |
-| **Development Build** | Build customizado no dispositivo | SDK Expo + módulos nativos custom | Desenvolvimento de produção |
-| **Standalone (produção)** | APK/AAB/IPA publicado | Tudo | Publicação nas lojas |
-
----
-
-### 18.2 Build com EAS (Expo Application Services)
-
-EAS é a plataforma de build em nuvem do Expo. Você não precisa do Android Studio nem do Xcode na sua máquina — o build acontece nos servidores da Expo.
+React Hook Form gerencia formulários com alta performance (evita re-renders a cada tecla). Zod valida os dados com segurança de tipo.
 
 ```bash
-# Instalar o EAS CLI
-npm install -g eas-cli
-
-# Fazer login na conta Expo
-eas login
-
-# Configurar o projeto (cria eas.json)
-eas build:configure
+npm install react-hook-form zod @hookform/resolvers
 ```
-
-```json
-// eas.json — perfis de build
-{
-  "build": {
-    "development": {
-      "developmentClient": true,    // gera um Development Build
-      "distribution": "internal"    // distribuição interna (não vai para loja)
-    },
-    "preview": {
-      "distribution": "internal",   // APK para testes internos
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "production": {
-      "android": {
-        "buildType": "app-bundle"   // AAB — formato exigido pela Google Play
-      }
-    }
-  }
-}
-```
-
-```bash
-# Build para Android (AAB para Google Play)
-eas build --platform android --profile production
-
-# Build para iOS (IPA para App Store)
-eas build --platform ios --profile production
-
-# Build para ambas as plataformas simultaneamente
-eas build --platform all --profile production
-
-# Enviar direto para as lojas após o build
-eas submit --platform android
-eas submit --platform ios
-```
-
----
-
-### 18.3 Build com React Native CLI (sem Expo)
-
-Para projetos sem Expo, o build é feito localmente com as ferramentas nativas.
-
-```bash
-# ── ANDROID ──────────────────────────────────────────────
-
-# 1. Gerar a keystore (certificado de assinatura) — apenas uma vez
-keytool -genkey -v \
-  -keystore meu-app.keystore \
-  -alias meu-app \
-  -keyalg RSA \
-  -keysize 2048 \
-  -validity 10000
-
-# 2. Configurar a keystore em android/gradle.properties
-# MYAPP_UPLOAD_STORE_FILE=meu-app.keystore
-# MYAPP_UPLOAD_KEY_ALIAS=meu-app
-# MYAPP_UPLOAD_STORE_PASSWORD=senha
-# MYAPP_UPLOAD_KEY_PASSWORD=senha
-
-# 3. Gerar o AAB de produção
-cd android
-./gradlew bundleRelease
-# Saída: android/app/build/outputs/bundle/release/app-release.aab
-
-# ── iOS (apenas macOS) ────────────────────────────────────
-
-# 1. Abrir no Xcode
-open ios/MeuApp.xcworkspace
-
-# 2. Product → Archive
-# 3. Distribute App → App Store Connect
-```
-
----
-
-### 18.4 Variáveis de ambiente por ambiente
-
-```bash
-# .env.development
-API_URL=https://dev-api.exemplo.com
-SENTRY_DSN=
-
-# .env.production
-API_URL=https://api.exemplo.com
-SENTRY_DSN=https://chave@sentry.io/projeto
-```
-
-```bash
-npm install react-native-dotenv
-# ou para Expo:
-npm install expo-constants
-```
-
-```tsx
-// app.config.ts — com Expo, variáveis ficam no extra do app.config
-import 'dotenv/config';
-
-export default {
-  expo: {
-    extra: {
-      apiUrl: process.env.API_URL,
-      sentryDsn: process.env.SENTRY_DSN,
-    },
-  },
-};
-
-// Uso no app
-import Constants from 'expo-constants';
-const apiUrl = Constants.expoConfig?.extra?.apiUrl;
-```
-
----
-
-## Parte 19 — Ferramentas e Ecossistema
-
----
-
-### 19.1 Ferramentas essenciais do dia a dia
-
-| Ferramenta | O que é | Por que usar |
-|---|---|---|
-| **Flipper** | Debugger desktop para React Native | Inspecionar rede, estado, logs, layout |
-| **React Native Debugger** | IDE de debugging standalone | Redux DevTools + React DevTools integrados |
-| **Reactotron** | Ferramenta de debug customizável | Inspecionar estado, requisições, logs |
-| **Expo Go** | App para testar sem compilar | Desenvolvimento rápido sem emulador |
-| **Android Studio** | IDE oficial Android | Emulador Android, inspetor de layout |
-| **Xcode** | IDE oficial Apple | Simulador iOS, Instruments |
-
----
-
-### 19.2 Bibliotecas essenciais que todo projeto usa
-
-```bash
-# Navegação
-npm install @react-navigation/native
-npm install @react-navigation/native-stack
-npm install @react-navigation/bottom-tabs
-npm install react-native-screens react-native-safe-area-context
-
-# Requisições HTTP
-npm install axios
-npm install @tanstack/react-query
-
-# Estado global
-npm install zustand
-
-# Armazenamento
-npm install @react-native-async-storage/async-storage
-npm install react-native-mmkv
-
-# Imagens
-npm install expo-image                  # Expo
-npm install react-native-fast-image    # React Native CLI
-
-# Animações
-npm install react-native-reanimated
-npm install react-native-gesture-handler
-npm install lottie-react-native
-
-# Formulários
-npm install react-hook-form
-npm install zod @hookform/resolvers
-
-# Ícones
-npm install @expo/vector-icons          # Expo
-npm install react-native-vector-icons  # React Native CLI
-
-# UI
-npm install react-native-paper
-npm install nativewind
-
-# Monitoramento
-npm install @sentry/react-native
-
-# Testes
-npm install --save-dev @testing-library/react-native
-npm install --save-dev @testing-library/jest-native
-
-# Utilidades
-npm install date-fns
-npm install react-native-uuid
-```
-
----
-
-### 19.3 React Hook Form + Zod — formulários com validação
 
 ```tsx
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+// Esquema de validação com Zod — funciona como especificação dos dados
 const esquemaCadastro = z.object({
   nome: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
   email: z.string().email('E-mail inválido'),
@@ -2773,6 +2597,7 @@ const esquemaCadastro = z.object({
   path: ['confirmarSenha'],
 });
 
+// TypeScript infere o tipo automaticamente do esquema Zod
 type FormCadastro = z.infer<typeof esquemaCadastro>;
 
 function FormularioCadastro() {
@@ -2786,6 +2611,7 @@ function FormularioCadastro() {
   });
 
   async function onSubmit(dados: FormCadastro) {
+    // handleSubmit só chama onSubmit se todos os campos forem válidos
     await api.post('/cadastro', dados);
     navigation.navigate('Home');
   }
@@ -2803,16 +2629,99 @@ function FormularioCadastro() {
               placeholder="Nome completo"
               style={[styles.input, errors.nome && styles.inputErro]}
             />
+            {/* Exibe a mensagem de erro do Zod se houver */}
             {errors.nome && <Text style={styles.textoErro}>{errors.nome.message}</Text>}
           </View>
         )}
       />
+
       <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={isSubmitting} style={styles.botao}>
         <Text>{isSubmitting ? 'Cadastrando...' : 'Cadastrar'}</Text>
       </TouchableOpacity>
     </View>
   );
 }
+```
+
+---
+
+## Parte 19 — Build e Publicação
+
+---
+
+### 19.1 Os três ambientes Expo
+
+| Ambiente | Como rodar | O que suporta | Quando usar |
+|---|---|---|---|
+| **Expo Go** | App da loja + QR code | Apenas SDK do Expo | Aprendizado e prototipagem |
+| **Development Build** | Build customizado no dispositivo | SDK Expo + módulos nativos custom | Desenvolvimento de produção |
+| **Standalone (produção)** | APK/AAB/IPA publicado | Tudo | Publicação nas lojas |
+
+---
+
+### 19.2 EAS Build
+
+EAS (Expo Application Services) é a plataforma de build em nuvem do Expo. O build acontece nos servidores da Expo — sem necessidade de Android Studio ou Xcode instalados localmente.
+
+```bash
+npm install -g eas-cli
+eas login
+eas build:configure       # cria o arquivo eas.json
+```
+
+```json
+// eas.json — perfis de build para cada ambiente
+{
+  "build": {
+    "development": {
+      "developmentClient": true,   // gera Development Build
+      "distribution": "internal"   // não vai para a loja
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" }  // APK para testes internos
+    },
+    "production": {
+      "android": { "buildType": "app-bundle" }  // AAB — exigido pela Google Play
+    }
+  }
+}
+```
+
+```bash
+# Build de produção para Android
+eas build --platform android --profile production
+
+# Build de produção para iOS
+eas build --platform ios --profile production
+
+# Enviar diretamente para as lojas após o build
+eas submit --platform android
+eas submit --platform ios
+```
+
+---
+
+### 19.3 Build com React Native CLI
+
+Para projetos sem Expo, o build é feito localmente com as ferramentas nativas.
+
+```bash
+# ── ANDROID ────────────────────────────────────────────
+
+# 1. Gerar a keystore de assinatura (apenas uma vez)
+keytool -genkey -v \
+  -keystore meu-app.keystore \
+  -alias meu-app \
+  -keyalg RSA -keysize 2048 -validity 10000
+
+# 2. Gerar o AAB de produção
+cd android
+./gradlew bundleRelease
+# Saída: android/app/build/outputs/bundle/release/app-release.aab
+
+# ── iOS (apenas macOS) ─────────────────────────────────
+# Abrir no Xcode: Product → Archive → Distribute App → App Store Connect
 ```
 
 ---
@@ -2828,32 +2737,32 @@ src/
 ├── assets/           → imagens, fontes, animações Lottie
 ├── components/
 │   ├── ui/           → componentes genéricos (Button, Card, Input)
-│   └── domain/       → componentes específicos do domínio (CardProduto)
+│   └── domain/       → componentes do domínio (CardProduto, ItemTarefa)
 ├── screens/
 │   ├── Home/
-│   │   ├── index.tsx           → componente da tela
+│   │   ├── index.tsx           → componente da tela (UI)
 │   │   ├── useHomeViewModel.ts → lógica da tela (hooks, estado)
-│   │   └── Home.styles.ts      → estilos
+│   │   └── Home.styles.ts      → estilos separados
 │   └── Produtos/
-├── navigation/       → toda a configuração de rotas e tipos
+├── navigation/       → configuração de rotas e tipos
 ├── services/
 │   ├── api.ts        → instância do Axios
 │   └── produtos.ts   → funções de cada endpoint
 ├── stores/           → estado global (Zustand)
 ├── hooks/            → custom hooks reutilizáveis
-├── utils/            → funções utilitárias puras
+├── utils/            → funções utilitárias puras (formatarPreco, validarCpf)
 ├── types/            → tipos TypeScript compartilhados
 └── constants/        → constantes do app (cores, tamanhos, rotas)
 ```
 
 ---
 
-### 20.2 O padrão de separação entre UI e lógica
+### 20.2 Separação entre UI e lógica
 
-Assim como no MVVM do Android, no React Native é uma boa prática separar a lógica da UI em um custom hook equivalente ao ViewModel:
+Equivalente ao padrão MVVM do Android: a tela (View) não contém lógica; a lógica fica em um custom hook (ViewModel).
 
 ```tsx
-// ── HOOK DE LÓGICA (equivalente ao ViewModel) ──────────────────────────
+// ── HOOK DE LÓGICA — equivalente ao ViewModel ─────────────────────────
 // hooks/useTelaProdutos.ts
 export function useTelaProdutos() {
   const { data: produtos, isLoading, isError, refetch } = useQuery({
@@ -2865,10 +2774,11 @@ export function useTelaProdutos() {
     mutationFn: carrinhoService.adicionar,
   });
 
+  // Retorna apenas o que a tela precisa — encapsula a complexidade
   return { produtos: produtos ?? [], isLoading, isError, refetch, adicionarAoCarrinho };
 }
 
-// ── COMPONENTE DE UI (equivalente ao Composable stateless) ──────────────
+// ── COMPONENTE DE UI — apenas renderização ─────────────────────────────
 // screens/Produtos/index.tsx
 function TelaProdutos() {
   const { produtos, isLoading, isError, refetch, adicionarAoCarrinho } =
@@ -2896,134 +2806,23 @@ function TelaProdutos() {
 
 ---
 
-## Parte 21 — Funcionalidades Nativas
-
----
-
-### 21.1 Câmera e galeria — expo-image-picker
-
-```bash
-npx expo install expo-image-picker
-```
-
-```tsx
-import * as ImagePicker from 'expo-image-picker';
-
-function SeletorImagem() {
-  const [imagem, setImagem] = useState<string | null>(null);
-
-  async function selecionarDaGaleria() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária para acessar a galeria');
-      return;
-    }
-
-    const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!resultado.canceled) setImagem(resultado.assets[0].uri);
-  }
-
-  async function tirarFoto() {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') return;
-
-    const resultado = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.8 });
-    if (!resultado.canceled) setImagem(resultado.assets[0].uri);
-  }
-
-  return (
-    <View>
-      {imagem && <Image source={{ uri: imagem }} style={{ width: 200, height: 200 }} />}
-      <TouchableOpacity onPress={selecionarDaGaleria}><Text>Galeria</Text></TouchableOpacity>
-      <TouchableOpacity onPress={tirarFoto}><Text>Câmera</Text></TouchableOpacity>
-    </View>
-  );
-}
-```
-
----
-
-### 21.2 Localização — expo-location
-
-```bash
-npx expo install expo-location
-```
-
-```tsx
-import * as Location from 'expo-location';
-
-async function obterLocalizacao() {
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
-    Alert.alert('Permissão de localização negada');
-    return;
-  }
-
-  const localizacao = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
-
-  console.log('Latitude:', localizacao.coords.latitude);
-  console.log('Longitude:', localizacao.coords.longitude);
-}
-```
-
----
-
-### 21.3 Notificações Push — expo-notifications
-
-```bash
-npx expo install expo-notifications expo-device
-```
-
-```tsx
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-
-async function registrarNotificacoes() {
-  if (!Device.isDevice) {
-    Alert.alert('Notificações push precisam de um dispositivo físico');
-    return;
-  }
-
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== 'granted') return;
-
-  const token = await Notifications.getExpoPushTokenAsync();
-  console.log('Push Token:', token.data);
-  // Envie este token para seu servidor para enviar notificações depois
-}
-```
-
----
-
-## Parte 22 — Resumo do Ecossistema
-
----
-
-### 22.1 O mapa completo das ferramentas
+## Parte 21 — Mapa do Ecossistema
 
 ```
 REACT NATIVE APP
 │
 ├── SCAFFOLDING
-│   ├── create-expo-app     → projeto Expo (recomendado para iniciantes)
-│   └── react-native-cli    → projeto nativo completo
+│   ├── create-expo-app       → projeto Expo (recomendado para iniciantes)
+│   └── react-native-cli      → projeto nativo completo
 │
 ├── LINGUAGEM
-│   └── TypeScript ✓        → padrão da indústria
+│   └── TypeScript ✓          → padrão da indústria
 │
 ├── UI E COMPONENTES
-│   ├── react-native-paper  → Material Design 3
-│   ├── gluestack-ui        → design system moderno
-│   ├── nativewind          → Tailwind CSS
-│   └── @expo/vector-icons  → ícones
+│   ├── react-native-paper    → Material Design 3
+│   ├── gluestack-ui          → design system moderno
+│   ├── nativewind            → Tailwind CSS
+│   └── @expo/vector-icons    → ícones
 │
 ├── NAVEGAÇÃO
 │   └── react-navigation ✓
@@ -3032,66 +2831,84 @@ REACT NATIVE APP
 │       └── drawer
 │
 ├── ESTADO
-│   ├── useState/useReducer → estado local
-│   ├── Context API         → estado global simples
-│   └── Zustand ✓           → estado global moderno
+│   ├── useState/useReducer   → estado local
+│   ├── Context API           → estado global simples
+│   └── Zustand ✓             → estado global moderno
 │
 ├── REQUISIÇÕES HTTP
-│   ├── Axios               → cliente HTTP
-│   └── TanStack Query ✓    → cache + loading + error automáticos
+│   ├── Axios                 → cliente HTTP
+│   └── TanStack Query ✓      → cache + loading + error automáticos
 │
 ├── FORMULÁRIOS
 │   ├── react-hook-form ✓
-│   └── zod                 → validação de schemas
+│   └── zod                   → validação de schemas
 │
 ├── ARMAZENAMENTO
-│   ├── AsyncStorage        → chave-valor assíncrono
-│   ├── MMKV ✓              → chave-valor síncrono e rápido
-│   └── WatermelonDB        → banco relacional offline
+│   ├── AsyncStorage          → chave-valor assíncrono
+│   ├── MMKV ✓                → chave-valor síncrono e rápido
+│   └── expo-sqlite           → banco relacional local
 │
 ├── ANIMAÇÕES
-│   ├── Reanimated 3 ✓      → animações nativas 60fps
-│   ├── Lottie              → animações vetoriais After Effects
-│   └── Animated API        → animações simples nativas
+│   ├── Reanimated 3 ✓        → animações nativas 60fps
+│   ├── Lottie                → animações vetoriais After Effects
+│   └── Animated API          → animações simples nativas
 │
 ├── MONITORAMENTO
-│   └── Sentry ✓            → captura erros em produção
+│   └── Sentry ✓              → captura erros em produção
 │
 ├── TESTES
-│   ├── Jest ✓              → testes unitários
+│   ├── Jest ✓                → testes unitários
 │   ├── React Native Testing Library ✓ → testes de componentes
-│   └── Detox               → testes E2E em dispositivos reais
+│   └── Detox                 → testes E2E em dispositivos reais
 │
 └── BUILD E PUBLICAÇÃO
-    ├── EAS Build ✓         → build em nuvem (Expo)
-    └── Gradle / Xcode      → build local (React Native CLI)
+    ├── EAS Build ✓           → build em nuvem (Expo)
+    └── Gradle / Xcode        → build local (React Native CLI)
 ```
 
 ---
 
-### 22.2 Tabela de resumo geral
+## Glossário
 
-| Conceito | Resumo |
+| Termo | Definição |
 |---|---|
-| **React Native** | Framework da Meta para apps móveis nativos com JavaScript/React |
-| **Expo** | Plataforma sobre React Native que abstrai configuração nativa |
-| **JSX** | Sintaxe que mistura JavaScript e XML para descrever UI |
-| **Componente** | Função JavaScript que retorna elementos de UI |
-| **useState** | Hook para estado local — equivalente ao `mutableStateOf` |
-| **useEffect** | Hook para efeitos colaterais — equivalente ao `init` do ViewModel |
-| **React.memo** | Memoriza um componente — evita re-renders quando as props não mudaram |
-| **useCallback** | Estabiliza referências de funções entre renders |
-| **FlatList** | Lista virtualizada — equivalente ao `LazyColumn` do Compose |
-| **StyleSheet** | Sistema de estilos baseado em objetos JS (não CSS) |
-| **Flexbox** | Sistema de layout — `flexDirection: 'column'` é o padrão |
-| **React Navigation** | Biblioteca de navegação padrão da comunidade |
-| **Zustand** | Gerenciamento de estado global moderno e simples |
-| **TanStack Query** | Cache + estado de requisições HTTP automático |
-| **Reanimated 3** | Animações nativas de 60fps na thread da UI |
-| **AsyncStorage/MMKV** | Persistência de dados chave-valor no dispositivo |
-| **React Hook Form** | Gerenciamento de formulários com alta performance |
-| **Error Boundary** | Componente que captura erros de renderização sem derrubar o app |
-| **Sentry** | Captura e monitora erros em produção |
-| **Hermes** | Motor JavaScript otimizado para React Native — AOT compilation |
-| **EAS Build** | Serviço de build em nuvem do Expo — sem precisar de Mac/Android Studio |
-| **TypeScript** | Tipagem estática — detecta erros antes de rodar o app |
+| <a name="asyncstorage">**AsyncStorage**</a> | Biblioteca para armazenar pares chave-valor de forma assíncrona e persistente no dispositivo. Equivalente ao SharedPreferences do Android. Não criptografado. |
+| <a name="bridge">**Bridge**</a> | Camada de comunicação entre a thread JavaScript e a thread nativa do React Native. Opera de forma assíncrona, em lote e serializada (JSON). Substituída gradualmente pelo JSI na Nova Arquitetura. |
+| <a name="bundle">**Bundle**</a> | Arquivo único gerado pelo Metro Bundler que contém todo o código JavaScript da aplicação, compactado e otimizado para distribuição. |
+| <a name="context-api">**Context API**</a> | API nativa do React para compartilhar dados entre componentes sem passar props manualmente em cada nível. Indicada para estado global simples. |
+| <a name="custom-hook">**Custom Hook**</a> | Função JavaScript cujo nome começa com `use` e encapsula lógica de estado reutilizável. Permite compartilhar lógica entre componentes sem duplicação. |
+| <a name="eas">**EAS (Expo Application Services)**</a> | Plataforma de build e distribuição em nuvem do Expo. Permite gerar APKs, AABs e IPAs sem necessidade de Android Studio ou Xcode instalados localmente. |
+| <a name="expo">**Expo**</a> | Plataforma construída sobre o React Native que abstrai a configuração do ambiente nativo. Oferece SDK com APIs prontas para câmera, localização, notificações, etc. |
+| <a name="expo-go">**Expo Go**</a> | App disponível na Google Play e App Store que permite rodar projetos Expo diretamente no celular via QR code, sem compilação nativa. |
+| <a name="fabric">**Fabric**</a> | Sistema de renderização da Nova Arquitetura do React Native. Substitui o renderer antigo e elimina parte da Bridge, comunicando-se diretamente com a thread nativa via JSI. |
+| <a name="flatlist">**FlatList**</a> | Componente de lista virtualizada do React Native. Renderiza apenas os itens visíveis na tela, economizando memória e melhorando performance. Equivalente ao LazyColumn do Jetpack Compose. |
+| <a name="flexbox">**Flexbox**</a> | Sistema de layout do React Native. `flexDirection: 'column'` é o padrão (diferente do web onde é `row`). Todo componente `View` já é flex por padrão. |
+| <a name="framework">**Framework**</a> | Conjunto de ferramentas, convenções e bibliotecas que provê uma estrutura para desenvolvimento de aplicações, impondo um modelo de organização e fluxo. |
+| <a name="hermes">**Hermes**</a> | Motor JavaScript desenvolvido pela Meta especificamente para React Native. Utiliza compilação AOT (Ahead-Of-Time) no momento do build, resultando em inicialização mais rápida e menor consumo de memória. Ativo por padrão desde RN 0.70. |
+| <a name="hooks">**Hooks**</a> | Funções especiais do React que permitem adicionar estado (`useState`), efeitos colaterais (`useEffect`) e outros recursos a componentes funcionais. Disponíveis desde o React 16.8. |
+| <a name="javascript">**JavaScript**</a> | Linguagem de programação interpretada, multiparadigma, base do ecossistema React Native. Não tem relação com Java. O padrão atual é o ECMAScript (ES6+). |
+| <a name="jsx">**JSX**</a> | Extensão de sintaxe do JavaScript que permite escrever estruturas semelhantes a HTML dentro do código JS. Compilado para chamadas `React.createElement()` pelo Babel. |
+| <a name="jsi">**JSI (JavaScript Interface)**</a> | Substituto moderno da Bridge na Nova Arquitetura. Permite chamadas síncronas entre JavaScript e código nativo, eliminando a serialização JSON. |
+| <a name="metro">**Metro Bundler**</a> | Empacotador (bundler) oficial do React Native. Responsável por transformar o código JavaScript e seus módulos em um único arquivo bundle para execução no dispositivo. |
+| <a name="mmkv">**MMKV**</a> | Biblioteca de armazenamento chave-valor síncrono de alta performance para React Native. Baseada no MMKV do WeChat. Alternativa ao AsyncStorage com leitura/escrita síncrona. |
+| <a name="native-modules">**Native Modules**</a> | Código nativo (Kotlin/Swift) exposto ao JavaScript via Bridge ou JSI. Permite acessar APIs do sistema operacional não disponíveis no core do React Native. |
+| <a name="npm">**npm**</a> | Node Package Manager. Gerenciador de pacotes do ecossistema JavaScript. Usado para instalar dependências em projetos React Native via `npm install`. |
+| <a name="paradigma-declarativo">**Paradigma Declarativo**</a> | Abordagem de programação onde o desenvolvedor descreve **o que** a UI deve mostrar, não **como** atualizar cada elemento. A UI é sempre uma função do estado: `UI = f(estado)`. |
+| <a name="props">**Props**</a> | Abreviação de "properties". Parâmetros passados de um componente pai para um componente filho. São imutáveis dentro do componente filho. |
+| <a name="react">**React**</a> | Biblioteca JavaScript da Meta para construção de interfaces de usuário declarativas com componentes reutilizáveis. Base sobre a qual o React Native é construído. |
+| <a name="react-navigation">**React Navigation**</a> | Biblioteca de navegação padrão da comunidade React Native. Oferece Stack Navigator, Bottom Tab Navigator, Drawer Navigator e outros. |
+| <a name="reanimated">**Reanimated 3**</a> | Biblioteca de animações para React Native que executa animações diretamente na thread nativa de UI via JSI, garantindo 60fps independente da carga na thread JavaScript. |
+| <a name="reducer">**Reducer**</a> | Função pura que recebe o estado atual e uma ação, e retorna o novo estado. Padrão usado com `useReducer` para gerenciar estado complexo de forma previsível. |
+| <a name="sentry">**Sentry**</a> | Plataforma de monitoramento de erros em produção. Captura, agrupa e notifica sobre exceções não tratadas em apps React Native em tempo real. |
+| <a name="stylesheet">**StyleSheet**</a> | API do React Native para definição de estilos via objetos JavaScript. Substitui o CSS da web. Propriedades usam camelCase e valores sem unidades (px, rem, dp). |
+| <a name="tanstack-query">**TanStack Query**</a> | Biblioteca para gerenciamento de estado de servidor em React Native. Gerencia automaticamente cache, estados de loading/error, refetch e paginação de requisições HTTP. |
+| <a name="thread">**Thread**</a> | Linha de execução independente em um processo. O React Native opera com duas threads principais: a JS thread (lógica JavaScript) e a main thread (renderização nativa). |
+| <a name="turbomodules">**TurboModules**</a> | Sistema de módulos nativos da Nova Arquitetura do React Native. Permite carregamento lazy e comunicação síncrona com código nativo via JSI, substituindo o sistema antigo de Native Modules. |
+| <a name="typescript">**TypeScript**</a> | Superset tipado do JavaScript mantido pela Microsoft. Adiciona verificação de tipos em tempo de compilação, autocompletar e documentação inline. Padrão no ecossistema React Native moderno. |
+| <a name="useeffect">**useEffect**</a> | Hook do React para execução de efeitos colaterais em componentes funcionais: chamadas de API, timers, subscrições. Aceita um array de dependências que controla quando o efeito é re-executado. |
+| <a name="usememo">**useMemo**</a> | Hook do React que memoriza o resultado de uma função computacionalmente custosa. Só recalcula quando as dependências mudam. |
+| <a name="usestate">**useState**</a> | Hook fundamental do React para declarar estado local em componentes funcionais. Retorna um par `[valorAtual, funcaoDeAtualização]`. Equivalente ao `mutableStateOf` + `remember` do Jetpack Compose. |
+| <a name="view">**View**</a> | Componente de layout mais básico do React Native. Equivale à `<div>` do HTML. Contêiner invisível que organiza outros componentes e suporta Flexbox para posicionamento. |
+| <a name="virtualizacao">**Virtualização**</a> | Técnica onde apenas os itens visíveis na tela são renderizados na memória, enquanto os demais são criados/destruídos conforme o scroll. Implementado pelo `FlatList` e `SectionList`. |
+| <a name="webview">**WebView**</a> | Componente que renderiza conteúdo HTML dentro de um container nativo. Ionic e Capacitor usam WebView — os elementos visuais são HTML/CSS, não componentes nativos reais. |
+| <a name="zustand">**Zustand**</a> | Biblioteca de gerenciamento de estado global para React/React Native com API minimalista. Não requer Provider ou Context. Os componentes se inscrevem diretamente nas fatias de estado que precisam. |
