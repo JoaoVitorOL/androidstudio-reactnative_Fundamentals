@@ -12,6 +12,21 @@
 
 Este guia reúne, em documento único, todo o conhecimento necessário para desenvolver aplicativos móveis com React Native partindo do absoluto zero. O conteúdo foi organizado de forma progressiva: cada parte pressupõe o domínio da anterior. Não é um tutorial de copiar e colar — cada bloco de código é acompanhado de explicação linha a linha, comparativos com tecnologias equivalentes e indicação explícita de armadilhas comuns. O leitor encontrará aqui desde a arquitetura interna do framework até o build de produção nas lojas, passando por componentes, estado, navegação, requisições HTTP, persistência, testes e performance. Exemplos práticos foram extraídos de aulas reais e expandidos com padrões da indústria. Palavras-chave técnicas estão linkadas ao Glossário ao final do documento. Ao terminar a leitura, o leitor estará apto a criar, organizar, otimizar e publicar um app React Native completo.
 
+### Como estudar este guia
+
+Este material foi escrito para ser lido de forma progressiva, mas não precisa ser consumido de uma única vez. Uma boa estratégia é:
+
+1. Ler as Partes 1 a 5 em sequência para formar a base mental do React Native.
+2. Praticar os exemplos em um projeto pequeno, mesmo que simples.
+3. Voltar depois para as Partes 6 em diante conforme surgirem necessidades reais do app.
+4. Usar o Glossário como apoio sempre que um termo técnico reaparecer.
+
+Se algum trecho parecer denso, a melhor abordagem não é decorar o código, mas responder três perguntas:
+
+- qual problema essa ferramenta resolve?
+- quando eu escolheria isso em vez de outra opção?
+- o que mudaria na experiência do usuário ou do desenvolvedor se eu não usasse isso?
+
 ---
 
 ## Sumário
@@ -42,11 +57,14 @@ Este guia reúne, em documento único, todo o conhecimento necessário para dese
   - [4.3 Estilos dinâmicos e condicionais](#43-estilos-dinâmicos-e-condicionais)
 - [Parte 5 — Estado e Hooks](#parte-5--estado-e-hooks)
   - [5.1 O que é estado](#51-o-que-é-estado)
-  - [5.2 useState](#52-usestate)
-  - [5.3 Atualização funcional do estado](#53-atualização-funcional-do-estado)
-  - [5.4 useEffect](#54-useeffect)
-  - [5.5 useMemo e useCallback](#55-usememo-e-usecallback)
-  - [5.6 Custom Hooks](#56-custom-hooks)
+  - [5.2 O que são Hooks](#52-o-que-são-hooks)
+  - [5.3 Tipos de Hooks](#53-tipos-de-hooks)
+  - [5.4 useState](#54-usestate)
+  - [5.5 Atualização funcional do estado](#55-atualização-funcional-do-estado)
+  - [5.6 useEffect](#56-useeffect)
+  - [5.7 useMemo e useCallback](#57-usememo-e-usecallback)
+  - [5.8 useRef](#58-useref)
+  - [5.9 Custom Hooks](#59-custom-hooks)
 - [Parte 6 — Listas e FlatList](#parte-6--listas-e-flatlist)
   - [6.1 Por que ScrollView não serve para listas longas](#61-por-que-scrollview-não-serve-para-listas-longas)
   - [6.2 FlatList](#62-flatlist)
@@ -1081,25 +1099,165 @@ const styles = StyleSheet.create({
 
 ### 5.1 O que é estado
 
-Estado é qualquer dado que muda ao longo do tempo e deve causar uma atualização visual quando muda. No React Native, o estado é gerenciado com **[Hooks](#hooks)** — funções especiais do React que permitem adicionar estado e outros recursos a componentes funcionais.
+Estado é a **memória do componente**. É onde o React guarda valores que podem mudar com o tempo e que precisam refletir na interface: texto digitado, contador, lista carregada da API, item selecionado, status de loading e assim por diante.
 
-Regras dos Hooks:
-1. **Chame Hooks apenas no nível mais alto.** Não dentro de loops, condições ou funções aninhadas.
-2. **Chame Hooks apenas de componentes funcionais** (ou de outros Hooks customizados).
+A ideia central do React Native continua sendo:
+
+```text
+UI = f(estado)
+```
+
+Ou seja: a tela que o usuário vê é uma consequência direta dos dados atuais. Quando o estado muda, o React executa o componente novamente e atualiza a UI para combinar com esse novo estado.
+
+Compare os três conceitos abaixo:
+
+| Conceito | Quem define | Pode mudar? | Quando usar |
+|---|---|---|---|
+| **Props** | Componente pai | Sim, mas quem muda é o pai | Dados recebidos de fora |
+| **Estado** | O próprio componente | Sim | Dados internos que afetam a tela |
+| **Variável comum** | O código local | Sim | Cálculos temporários que não precisam re-renderizar |
+
+```tsx
+import { useState } from 'react';
+
+function Exemplo() {
+  let contadorComum = 0; // variável comum
+  const [contador, setContador] = useState(0); // estado real
+
+  function incrementarErrado() {
+    contadorComum += 1;
+    // A UI não acompanha essa mudança porque o React não monitora essa variável
+  }
+
+  function incrementarCerto() {
+    setContador(valorAtual => valorAtual + 1);
+    // Aqui o React sabe que precisa renderizar de novo
+  }
+}
+```
+
+Resumo prático: se um valor mudou e a tela precisa refletir essa mudança, isso quase sempre é **estado**.
 
 ---
 
-### 5.2 useState
+### 5.2 O que são Hooks
 
-`useState` é o Hook mais básico. Ele declara um estado que o React monitora e, quando muda, reexecuta o componente para atualizar a UI.
+**[Hooks](#hooks)** são funções especiais do React que conectam componentes funcionais a recursos do framework: estado, efeitos colaterais, contexto, referências e otimizações.
+
+Antes dos Hooks, esse tipo de recurso ficava concentrado principalmente em componentes de classe. Hoje, em React Native moderno, Hooks são a forma padrão de organizar lógica de componente.
+
+Uma boa forma de pensar é:
+
+- O componente descreve **o que renderizar**
+- Os Hooks dizem **como esse componente guarda estado, reage a mudanças e conversa com o mundo externo**
+
+Exemplo:
+
+```tsx
+import { useState, useEffect } from 'react';
+import { Text } from 'react-native';
+
+function Perfil() {
+  const [nome, setNome] = useState('Maria');
+
+  useEffect(() => {
+    console.log('O nome mudou para:', nome);
+  }, [nome]);
+
+  return <Text>{nome}</Text>;
+}
+```
+
+No exemplo acima:
+
+- `useState` guarda o valor `nome`
+- `useEffect` reage quando `nome` muda
+- o componente continua sendo uma função normal de JavaScript
+
+#### Regras dos Hooks
+
+Hooks funcionam porque o React depende da **ordem em que eles são chamados**. Por isso, existem regras rígidas:
+
+1. **Chame Hooks apenas no nível mais alto do componente.**
+2. **Nunca chame Hooks dentro de `if`, `for`, `while`, callbacks ou funções aninhadas.**
+3. **Chame Hooks apenas em componentes React ou em outros custom hooks.**
+
+Exemplo incorreto:
+
+```tsx
+function Tela({ logado }) {
+  if (logado) {
+    // ❌ Errado: o Hook fica dentro de uma condição
+    const [nome, setNome] = useState('');
+  }
+
+  return <Text>Tela</Text>;
+}
+```
+
+Exemplo correto:
+
+```tsx
+function Tela({ logado }) {
+  // ✅ O Hook sempre é chamado na mesma ordem
+  const [nome, setNome] = useState('');
+
+  if (!logado) {
+    return <Text>Faça login</Text>;
+  }
+
+  return <Text>Olá, {nome}</Text>;
+}
+```
+
+---
+
+### 5.3 Tipos de Hooks
+
+Não existe uma divisão "oficial" da documentação com essa exata nomenclatura, mas, para estudar, é útil separar Hooks por **papel**:
+
+| Tipo | Hooks comuns | Para que servem | Exemplo de uso |
+|---|---|---|---|
+| **Hooks de estado** | `useState`, `useReducer` | Guardar dados que mudam e alteram a UI | contador, formulário, toggle |
+| **Hooks de efeito** | `useEffect` | Sincronizar o componente com algo externo | API, timer, listener |
+| **Hooks de contexto** | `useContext` | Consumir dados globais compartilhados | tema, usuário autenticado |
+| **Hooks de referência** | `useRef` | Guardar valores mutáveis sem re-renderizar | foco em input, ID de timer |
+| **Hooks de performance** | `useMemo`, `useCallback` | Evitar trabalho desnecessário quando isso realmente importa | lista filtrada, função passada como prop |
+| **Custom Hooks** | `useBuscaCep`, `useAuth`, `useCarrinho` | Reutilizar lógica composta por outros Hooks | lógica compartilhada entre telas |
+
+Em aplicações React Native do dia a dia, os mais comuns para iniciantes são:
+
+1. `useState`
+2. `useEffect`
+3. `useRef`
+4. `useMemo` e `useCallback`
+5. Custom Hooks
+
+`useContext` e `useReducer` também são muito importantes, mas normalmente aparecem com mais força quando a aplicação cresce e a organização de estado fica mais sofisticada.
+
+---
+
+### 5.4 useState
+
+`useState` é o Hook mais básico e mais importante para começar. Ele cria um pedaço de estado local dentro do componente.
+
+Sintaxe:
+
+```tsx
+const [valorAtual, setValorAtual] = useState(valorInicial);
+```
+
+- `valorAtual` é o dado atual
+- `setValorAtual` é a função que agenda a atualização
+- `valorInicial` é o valor usado na primeira renderização
+
+Exemplo completo:
 
 ```tsx
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 function Contador() {
-  // useState(0) → valor inicial é 0
-  // Retorna: [valorAtual, funcaoParaAtualizar]
   const [contador, setContador] = useState(0);
   const [nome, setNome] = useState('Usuário');
 
@@ -1116,10 +1274,17 @@ function Contador() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.botao, { backgroundColor: 'red' }]}
+        style={[styles.botao, { backgroundColor: '#d9534f' }]}
         onPress={() => setContador(0)}
       >
         <Text style={styles.textoBotao}>Resetar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.botao, { backgroundColor: '#5cb85c' }]}
+        onPress={() => setNome('Ana')}
+      >
+        <Text style={styles.textoBotao}>Trocar nome</Text>
       </TouchableOpacity>
     </View>
   );
@@ -1134,7 +1299,9 @@ function Contador() {
 | `x = novoValor` | `setX(novoValor)` |
 | Recomposição automática | Re-renderização automática |
 
-**useState com objeto complexo (formulário):**
+#### Estado com objetos e arrays
+
+Quando o estado é um objeto ou array, você não deve mutá-lo diretamente. O React espera uma **nova referência**.
 
 ```tsx
 const [formData, setFormData] = useState({
@@ -1143,32 +1310,66 @@ const [formData, setFormData] = useState({
   idade: '',
 });
 
-// Para atualizar um campo sem sobrescrever os outros:
-// spread operator (...formData) preserva os demais campos
+// ✅ Atualização correta: cria um novo objeto
 setFormData({ ...formData, email: 'novo@email.com' });
+
+const [tarefas, setTarefas] = useState(['Estudar Hooks']);
+
+// ❌ Errado: muta o array existente
+tarefas.push('Revisar useEffect');
+
+// ✅ Certo: cria um novo array
+setTarefas([...tarefas, 'Revisar useEffect']);
 ```
 
 ---
 
-### 5.3 Atualização funcional do estado
+### 5.5 Atualização funcional do estado
 
-Quando o novo valor depende do valor anterior, use a **forma funcional** do setter para evitar problemas com closures:
+Quando o próximo estado depende do valor anterior, use a **forma funcional** do setter:
 
 ```tsx
 const [contador, setContador] = useState(0);
 
-// ❌ Pode ter bugs em atualizações rápidas
-onPress={() => setContador(contador + 1)}
+// ❌ Pode gerar resultado inesperado em atualizações encadeadas
+setContador(contador + 1);
+setContador(contador + 1);
+setContador(contador + 1);
+// Resultado esperado por muita gente: +3
+// Resultado real comum: +1
 
-// ✅ Sempre usa o valor mais recente — forma funcional
-onPress={() => setContador(valorAnterior => valorAnterior + 1)}
+// ✅ Sempre usa o valor mais recente disponível
+setContador(valorAnterior => valorAnterior + 1);
+setContador(valorAnterior => valorAnterior + 1);
+setContador(valorAnterior => valorAnterior + 1);
+// Resultado: +3
 ```
+
+Isso acontece porque atualizações de estado podem ser agrupadas (*batched*). A função recebe o valor mais recente já processado pelo React, então ela é a forma segura quando existe dependência do estado anterior.
+
+Regra prática:
+
+- Se você já tem o valor pronto, use `setAlgo(novoValor)`
+- Se o novo valor depende do anterior, use `setAlgo(valorAnterior => ...)`
 
 ---
 
-### 5.4 useEffect
+### 5.6 useEffect
 
-`useEffect` é usado para executar código com efeitos colaterais: buscar dados de API, configurar timers, fazer log, etc.
+`useEffect` serve para lidar com **efeitos colaterais**. Em outras palavras: código que sai da renderização pura e sincroniza o componente com algo externo.
+
+Casos típicos:
+
+- buscar dados em uma API
+- configurar e limpar timers
+- adicionar listeners de eventos
+- sincronizar dados com `AsyncStorage`
+- fazer log, analytics ou integração com bibliotecas nativas
+
+Uma distinção importante:
+
+- **Renderizar** é descrever a UI
+- **Effect** é reagir depois que a UI já foi descrita
 
 ```tsx
 import { useState, useEffect } from 'react';
@@ -1180,27 +1381,34 @@ function ExemploUseEffect() {
   const [erro, setErro] = useState(null);
 
   useEffect(() => {
-    // Função assíncrona declarada dentro do useEffect
+    let cancelado = false;
+
     async function buscarUsuarios() {
       try {
         const resposta = await fetch('https://jsonplaceholder.typicode.com/users');
         const dados = await resposta.json();
-        setUsuarios(dados);
+
+        if (!cancelado) {
+          setUsuarios(dados);
+        }
       } catch (e) {
-        setErro('Erro ao carregar dados');
+        if (!cancelado) {
+          setErro('Erro ao carregar dados');
+        }
       } finally {
-        // finally garante que carregando=false mesmo se der erro
-        setCarregando(false);
+        if (!cancelado) {
+          setCarregando(false);
+        }
       }
     }
 
     buscarUsuarios();
 
-    // Função de limpeza — executada quando o componente sai da tela
     return () => {
-      console.log('Componente desmontado — cancele requisições aqui');
+      // Evita atualizar estado depois que a tela já saiu
+      cancelado = true;
     };
-  }, []); // [] = executa apenas uma vez, na montagem do componente
+  }, []);
 
   if (carregando) return <ActivityIndicator size="large" color="#007AFF" />;
   if (erro) return <Text style={{ color: 'red' }}>{erro}</Text>;
@@ -1215,7 +1423,7 @@ function ExemploUseEffect() {
 }
 ```
 
-**Como o array de dependências controla o `useEffect`:**
+#### Como o array de dependências funciona
 
 ```tsx
 useEffect(() => { /* executa toda vez que o componente re-renderiza */ });
@@ -1225,44 +1433,151 @@ useEffect(() => { /* executa APENAS na montagem */ }, []);
 useEffect(() => { /* executa quando 'userId' ou 'filtro' mudam */ }, [userId, filtro]);
 ```
 
+#### Quando NÃO usar `useEffect`
+
+Um erro muito comum é usar `useEffect` para calcular valores que poderiam ser derivados diretamente na renderização.
+
+```tsx
+// ❌ Desnecessário
+const [nomeCompleto, setNomeCompleto] = useState('');
+
+useEffect(() => {
+  setNomeCompleto(`${nome} ${sobrenome}`);
+}, [nome, sobrenome]);
+
+// ✅ Melhor: valor derivado diretamente
+const nomeCompleto = `${nome} ${sobrenome}`;
+```
+
+Se um valor pode ser calculado a partir de props, estado e variáveis locais sem acessar nada externo, normalmente ele **não precisa de `useEffect`**.
+
 ---
 
-### 5.5 useMemo e useCallback
+### 5.7 useMemo e useCallback
+
+`useMemo` e `useCallback` são Hooks de **otimização**, não de funcionalidade básica. O componente funciona sem eles na maioria dos casos.
+
+A pergunta certa não é "posso usar?", mas sim:
+
+```text
+Existe um problema real de performance ou de identidade de referência aqui?
+```
+
+Diferença entre os dois:
+
+| Hook | Memoriza o quê? | Quando usar |
+|---|---|---|
+| `useMemo` | O resultado de um cálculo | Quando o cálculo é caro ou quando você precisa estabilizar um valor |
+| `useCallback` | A própria função | Quando a função é passada para filhos memorizados ou usada em dependências |
 
 ```tsx
 import { useMemo, useCallback } from 'react';
 
 function ListaFiltrada({ itens, termoBusca }) {
-  // useMemo: recalcula apenas quando 'itens' ou 'termoBusca' mudam
-  // Sem useMemo, o filter rodaria a cada re-render do componente pai
   const itensFiltrados = useMemo(() => {
     return itens.filter(item =>
       item.nome.toLowerCase().includes(termoBusca.toLowerCase())
     );
   }, [itens, termoBusca]);
 
-  // useCallback: memoriza a função — evita recriá-la a cada render
-  // Essencial quando a função é passada como prop para componentes filhos com React.memo
   const handlePress = useCallback((id) => {
     console.log('Item selecionado:', id);
-  }, []); // [] = a função nunca muda
+  }, []);
 
   return (/* JSX */);
 }
 ```
 
+Regra prática:
+
+- `useMemo` evita recalcular um **valor**
+- `useCallback` evita recriar uma **função**
+- se não existe cálculo caro nem componente sensível a referência, provavelmente você não precisa deles
+
 ---
 
-### 5.6 Custom Hooks
+### 5.8 useRef
 
-Custom Hooks são funções que encapsulam lógica de estado reutilizável. O nome deve começar com `use`.
+`useRef` guarda um valor mutável que **sobrevive entre renderizações** sem causar nova renderização quando muda.
+
+Ele é muito útil em dois cenários:
+
+1. acessar um componente nativo de forma imperativa
+2. guardar dados auxiliares que não precisam aparecer na tela
+
+Exemplo com foco em `TextInput`:
 
 ```tsx
-// hooks/useBuscaCep.ts
-// Encapsula toda a lógica de busca de CEP para reutilização em qualquer tela
-import { useState } from 'react';
+import { useRef } from 'react';
+import { TextInput, TouchableOpacity, Text, View } from 'react-native';
 
-function useBuscaCep() {
+function Busca() {
+  const inputRef = useRef<TextInput>(null);
+
+  return (
+    <View>
+      <TextInput
+        ref={inputRef}
+        placeholder="Digite sua busca"
+        style={{ borderWidth: 1, padding: 12, marginBottom: 12 }}
+      />
+
+      <TouchableOpacity onPress={() => inputRef.current?.focus()}>
+        <Text>Focar no campo</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+```
+
+Exemplo guardando um ID de timer:
+
+```tsx
+const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+useEffect(() => {
+  timerRef.current = setInterval(() => {
+    console.log('Rodando...');
+  }, 1000);
+
+  return () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+}, []);
+```
+
+Ponto importante: mudar `ref.current` **não re-renderiza** o componente. Se a UI precisa reagir, o dado deve estar em `useState`, não em `useRef`.
+
+---
+
+### 5.9 Custom Hooks
+
+Custom Hooks são funções cujo nome começa com `use` e que encapsulam lógica reutilizável baseada em outros Hooks.
+
+Eles não criam "poderes especiais" novos. Apenas permitem compor:
+
+- `useState`
+- `useEffect`
+- `useRef`
+- `useMemo`
+- outros Hooks customizados
+
+Quando vale a pena extrair um custom hook:
+
+- quando duas telas repetem a mesma lógica
+- quando um componente ficou grande e misturou UI com regras de negócio
+- quando você quer padronizar acesso a uma API, permissão ou fluxo de formulário
+
+Importante: custom hook **não significa estado global**. Cada chamada cria uma instância independente daquela lógica.
+
+```tsx
+// Exemplo didático: definição do hook + uso em uma tela
+import { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+
+export function useBuscaCep() {
   const [dados, setDados] = useState(null);
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState(null);
@@ -1281,7 +1596,7 @@ function useBuscaCep() {
         estado: json.uf,
       });
     } catch (e) {
-      setErro(e.message);
+      setErro(e instanceof Error ? e.message : 'Erro ao buscar CEP');
     } finally {
       setCarregando(false);
     }
@@ -1290,7 +1605,7 @@ function useBuscaCep() {
   return { dados, carregando, erro, buscar };
 }
 
-// Uso em qualquer componente — sem duplicar a lógica
+// Uso em qualquer componente
 function TelaCadastro() {
   const [cep, setCep] = useState('');
   const { dados, carregando, erro, buscar } = useBuscaCep();
@@ -1321,9 +1636,31 @@ function TelaCadastro() {
 
 **A solução é `FlatList`** — a lista virtualizada do React Native. Ela só renderiza os itens que estão visíveis na tela em um dado momento (equivalente ao `LazyColumn` do Jetpack Compose).
 
+Pense assim:
+
+- `ScrollView` é bom quando você já sabe que o conteúdo será pequeno
+- `FlatList` é bom quando a quantidade de itens pode crescer
+- `SectionList` é bom quando, além de crescer, os dados precisam ser agrupados
+
+A palavra-chave aqui é **virtualização**. Em vez de manter tudo montado ao mesmo tempo, o React Native recicla e desmonta partes da lista conforme o usuário rola a tela. Isso reduz uso de memória e melhora a fluidez do scroll.
+
+Regra prática:
+
+- formulário, tela de perfil, página de detalhe: `ScrollView`
+- feed, catálogo, chat, histórico, ranking: `FlatList`
+- agenda, lista por categoria, contatos por letra: `SectionList`
+
 ---
 
 ### 6.2 FlatList
+
+`FlatList` é um dos componentes mais importantes do React Native porque listas longas aparecem em quase todo app real. Para usar bem, você precisa entender três props fundamentais:
+
+- `data`: o array de itens
+- `renderItem`: a função que desenha cada linha
+- `keyExtractor`: a chave única de cada item
+
+Se essas três partes estiverem corretas, a lista já nasce saudável. O resto são refinamentos de experiência e performance.
 
 ```tsx
 import { FlatList, View, Text, StyleSheet } from 'react-native';
@@ -1371,9 +1708,22 @@ function ListaTarefas() {
 }
 ```
 
+Pontos que merecem atenção:
+
+- `keyExtractor` deve usar um identificador estável. Índice do array só é aceitável quando a lista nunca muda de ordem nem recebe inserções.
+- `renderItem` é chamado muitas vezes. Quanto mais leve for o item renderizado, melhor será a rolagem.
+- `ListEmptyComponent`, `ListHeaderComponent` e `ItemSeparatorComponent` deixam a lista mais profissional sem precisar “gambiarrar” elementos fora dela.
+- `refreshing` e `onRefresh` são o jeito nativo de implementar pull to refresh.
+
+Erro comum: colocar uma `ScrollView` em volta da `FlatList`. Na maioria dos casos isso quebra a virtualização e piora a performance. Se a própria lista já rola, ela normalmente deve ser o contêiner principal da tela.
+
 ---
 
 ### 6.3 SectionList
+
+`SectionList` é a versão agrupada da `FlatList`. Em vez de um único array simples, ela recebe um array de seções. Cada seção tem um título e um conjunto de itens.
+
+Ela é ideal quando o agrupamento faz parte da experiência de leitura. O usuário não quer apenas ver itens soltos; ele quer entender a estrutura dos dados.
 
 ```tsx
 import { SectionList, Text, View } from 'react-native';
@@ -1411,6 +1761,8 @@ function ListaComSecoes() {
 | `FlatList` | ✅ | Listas com quantidade variável ou grande de itens |
 | `SectionList` | ✅ | Listas agrupadas por categoria/seção |
 
+Se a sua lista está ficando lenta, a primeira pergunta não é "qual otimização avançada eu ativo?", mas sim: **estou usando o componente certo para o tipo de conteúdo?**
+
 ---
 
 ## Parte 7 — Navegação com React Navigation
@@ -1420,6 +1772,16 @@ function ListaComSecoes() {
 ### 7.1 Instalação
 
 React Navigation é a biblioteca de navegação padrão da comunidade React Native. Não faz parte do núcleo do framework — é instalada separadamente.
+
+Navegação em app mobile não é só "trocar de tela". Ela define:
+
+- histórico de navegação
+- botão voltar
+- cabeçalhos
+- parâmetros entre telas
+- estrutura de abas, pilhas e drawers
+
+O React Navigation resolve tudo isso de forma declarativa, integrada ao ciclo de vida do React.
 
 ```bash
 npm install @react-navigation/native
@@ -1431,6 +1793,19 @@ npm install @react-navigation/bottom-tabs        # abas inferiores
 ---
 
 ### 7.2 Stack Navigator
+
+O `Stack Navigator` funciona como uma pilha de cartas:
+
+- quando você abre uma nova tela, ela é empilhada sobre a anterior
+- quando volta, a tela do topo é removida
+
+Esse modelo combina com fluxos de detalhe, cadastro, checkout e qualquer jornada sequencial.
+
+Também vale fixar o papel de cada peça:
+
+- `NavigationContainer`: gerencia o estado global da navegação
+- `Stack.Navigator`: define um grupo de telas que pertencem à mesma pilha
+- `Stack.Screen`: registra cada tela disponível dentro dessa pilha
 
 ```tsx
 // navigation/AppNavigator.tsx
@@ -1477,6 +1852,22 @@ export function AppNavigator() {
 ---
 
 ### 7.3 Navegar e passar parâmetros
+
+Parâmetros de navegação servem para contexto de tela, não para substituir estado global.
+
+Bom uso de params:
+
+- ID do produto que será exibido
+- título da tela
+- modo atual, como `"editar"` ou `"criar"`
+
+Mau uso de params:
+
+- carrinho inteiro
+- usuário autenticado inteiro
+- objetos pesados que poderiam ser buscados por ID
+
+Pense nos params como a "URL mental" da tela: eles dizem **qual tela** abrir e **com qual contexto mínimo**.
 
 ```tsx
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -1527,9 +1918,32 @@ function TelaDetalhe({ navigation, route }: DetalheProps) {
 | `navigation.popToTop()` | Volta para a tela raiz da pilha |
 | `navigation.replace('NomeDaTela')` | Substitui a tela atual sem adicionar ao histórico |
 
+Regra prática:
+
+- `navigate` para ir até um destino conhecido
+- `push` quando você quer abrir outra instância da mesma tela
+- `replace` em fluxos como login, splash e onboarding, onde voltar não faz sentido
+
 ---
 
 ### 7.4 Bottom Tab Navigator
+
+Abas inferiores funcionam melhor quando representam **grandes áreas do app**, não ações pontuais.
+
+Boas abas:
+
+- Início
+- Busca
+- Favoritos
+- Perfil
+
+Más abas:
+
+- "Salvar"
+- "Enviar"
+- "Confirmar"
+
+Abas organizam a navegação lateral entre áreas. Ações continuam sendo responsabilidade de botões dentro das telas.
 
 ```tsx
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -1566,6 +1980,13 @@ function TabNavigator() {
 
 ### 7.5 Navegação aninhada
 
+Navegação aninhada existe porque apps reais têm mais de um tipo de fluxo ao mesmo tempo. Um caso clássico é:
+
+- uma estrutura principal por abas
+- dentro de cada aba, uma pilha própria de telas
+
+Isso evita misturar tudo em uma única pilha gigante e deixa o comportamento do botão voltar mais previsível.
+
 ```tsx
 // Estrutura comum: abas que têm suas próprias pilhas de navegação
 function AppNavigator() {
@@ -1601,6 +2022,16 @@ function InicioStackNavigator() {
 ### 8.1 Context API
 
 Quando múltiplas telas precisam do mesmo dado (usuário logado, carrinho de compras, tema), o estado precisa ser **global**.
+
+O problema que o Context resolve é o **prop drilling**: passar a mesma informação por muitos níveis de componentes só para um filho distante conseguir usá-la.
+
+Sem Context:
+
+```text
+App -> Layout -> Tela -> Header -> AvatarUsuario
+```
+
+Com Context, qualquer componente abaixo do Provider pode consumir o dado diretamente, sem esse repasse manual.
 
 ```tsx
 // contexts/AuthContext.tsx
@@ -1658,11 +2089,26 @@ function TelaHome() {
 }
 ```
 
+O Context funciona muito bem quando:
+
+- o dado é realmente compartilhado
+- a frequência de atualização não é absurda
+- você quer algo nativo do React, sem biblioteca extra
+
+Exemplos clássicos: autenticação, tema, idioma e preferências globais.
+
 ---
 
 ### 8.2 Zustand
 
 Zustand é uma biblioteca de estado global moderna, com menos código que Redux e sem a verbosidade do Context API para estados complexos.
+
+A principal diferença mental é esta:
+
+- no Context, você costuma pensar em `Provider` + `value`
+- no Zustand, você pensa em **store global** + **fatias de estado**
+
+Outro benefício prático é que o componente pode selecionar só o que precisa da store, reduzindo re-renderizações desnecessárias.
 
 ```bash
 npm install zustand
@@ -1699,7 +2145,8 @@ export const useCarrinhoStore = create((set, get) => ({
 
 // Uso em qualquer componente — sem Provider, sem Context:
 function BotaoCarrinho() {
-  const { totalItens, adicionarItem } = useCarrinhoStore();
+  const totalItens = useCarrinhoStore(state => state.totalItens);
+  const adicionarItem = useCarrinhoStore(state => state.adicionarItem);
   return <Text>Carrinho: {totalItens}</Text>;
 }
 ```
@@ -1711,6 +2158,12 @@ function BotaoCarrinho() {
 | `Redux Toolkit` | Alta | Alta | Apps enterprise, equipes grandes |
 | `Jotai` | Muito baixa | Baixa | Estado atômico e granular |
 
+Se você está começando:
+
+- use `useState` para estado local
+- use `Context API` para compartilhamentos simples
+- use `Zustand` quando o app crescer e o estado global começar a exigir mais organização
+
 ---
 
 ## Parte 9 — Requisições HTTP
@@ -1720,6 +2173,15 @@ function BotaoCarrinho() {
 ### 9.1 Fetch nativo
 
 A API `fetch` está disponível nativamente no React Native — sem instalação adicional.
+
+Ela é o ponto de partida ideal para entender o básico de HTTP:
+
+- método (`GET`, `POST`, `PUT`, `DELETE`)
+- headers
+- corpo da requisição
+- tratamento de status de resposta
+
+O lado ruim é que quase tudo fica manual: tratamento de erro, timeout, interceptação, autenticação repetida e cache.
 
 ```tsx
 // GET — buscar dados
@@ -1748,11 +2210,20 @@ async function criarTarefa(titulo) {
 }
 ```
 
+`fetch` é ótimo para aprender e para casos simples. Quando o projeto começa a repetir muita configuração de rede, vale migrar para uma camada mais estruturada.
+
 ---
 
 ### 9.2 Axios
 
 Axios é um cliente HTTP com recursos adicionais como interceptors, timeout e cancelamento.
+
+Na prática, Axios costuma entrar quando você quer uma camada de API mais profissional:
+
+- instância centralizada
+- configuração padrão compartilhada
+- interceptors para token e tratamento global de erro
+- menos código repetido em cada chamada
 
 ```bash
 npm install axios
@@ -1788,11 +2259,20 @@ api.interceptors.response.use(
 );
 ```
 
+Pense no Axios como o "cliente de transporte" das requisições. Ele melhora a ergonomia da chamada HTTP, mas ainda não resolve sozinho o ciclo de vida completo dos dados na interface.
+
 ---
 
 ### 9.3 TanStack Query
 
 TanStack Query (anteriormente React Query) é o padrão moderno para requisições HTTP. Gerencia automaticamente cache, estados de loading/error e revalidação.
+
+O conceito mais importante aqui é distinguir dois tipos de estado:
+
+- **estado de UI**: modal aberto, texto digitado, aba ativa
+- **estado de servidor**: lista de produtos, perfil do usuário, pedidos vindos da API
+
+TanStack Query foi criado para o segundo caso. Ele entende que dados de servidor podem ficar desatualizados, precisam de cache, refetch e invalidação.
 
 ```bash
 npm install @tanstack/react-query
@@ -1870,6 +2350,14 @@ function FormularioTarefa() {
 | `Axios` | ❌ | Manual | Manual | Baixa |
 | `TanStack Query` | ✅ | Automático | Automático | Média |
 
+Resumo honesto:
+
+- `fetch` ensina os fundamentos
+- `Axios` melhora a camada de transporte
+- `TanStack Query` melhora a experiência de dados no app inteiro
+
+É comum usar **Axios + TanStack Query** juntos: Axios faz a chamada HTTP; TanStack Query gerencia cache e sincronização.
+
 ---
 
 ## Parte 10 — Persistência de Dados
@@ -1879,6 +2367,15 @@ function FormularioTarefa() {
 ### 10.1 AsyncStorage
 
 AsyncStorage é o equivalente ao `SharedPreferences` do Android — armazena pares chave/valor do tipo string que persistem mesmo após o app ser fechado.
+
+Ele funciona bem para dados pequenos e simples, como:
+
+- tema escuro/claro
+- token de sessão não sensível
+- flags de onboarding
+- filtros e preferências do usuário
+
+O ponto-chave é lembrar que tudo vira string. Quando o dado é objeto ou array, você precisa serializar com `JSON.stringify` e desserializar com `JSON.parse`.
 
 ```bash
 npx expo install @react-native-async-storage/async-storage
@@ -1910,11 +2407,21 @@ await AsyncStorage.clear();
 
 > **Segurança:** AsyncStorage **não é criptografado**. Para dados sensíveis como tokens, use `react-native-keychain` ou `expo-secure-store`.
 
+Se você precisa guardar poucas preferências e quer a solução mais simples possível, AsyncStorage costuma ser suficiente.
+
 ---
 
 ### 10.2 MMKV
 
 MMKV é uma alternativa ao AsyncStorage com performance muito superior — é **síncrona** (sem await).
+
+Isso significa que leitura e escrita acontecem de forma imediata, o que pode ser útil em fluxos que dependem de acesso muito frequente a dados locais.
+
+Em geral, MMKV faz mais sentido quando:
+
+- você lê e grava valores com muita frequência
+- quer reduzir overhead de Promises
+- o armazenamento local já virou parte importante da experiência do app
 
 ```bash
 npm install react-native-mmkv
@@ -1942,11 +2449,26 @@ storage.delete('token');
 | Criptografia | Não | Sim (com configuração) |
 | Tamanho máximo | Sem limite definido | Sem limite definido |
 
+Em termos práticos:
+
+- AsyncStorage prioriza simplicidade
+- MMKV prioriza velocidade
+
+Se o seu app ainda é pequeno, não existe problema nenhum em começar com AsyncStorage e migrar depois.
+
 ---
 
 ### 10.3 SQLite com expo-sqlite
 
 SQLite é um banco de dados relacional local, embutido no dispositivo. Recomendado quando os dados têm estrutura tabular e relacionamentos.
+
+Ele entra em cena quando chave/valor já não basta mais. Exemplos:
+
+- app de estoque com produtos, categorias e movimentações
+- app offline com várias tabelas relacionadas
+- histórico grande que precisa de busca, filtro e paginação local
+
+Se você precisa fazer consultas como "traga os 20 pedidos mais recentes do usuário X" ou "liste produtos com estoque abaixo de 10", um banco relacional faz muito mais sentido do que salvar tudo em JSON.
 
 ```bash
 npx expo install expo-sqlite
@@ -2015,6 +2537,12 @@ function MinhaTelaComBancoDados() {
 | `db.runAsync(sql, params)` | Versão assíncrona de runSync | ❌ |
 | `db.getAllAsync(sql, params)` | Versão assíncrona de getAllSync | ❌ |
 
+Guia de escolha rápida:
+
+- poucos dados simples: `AsyncStorage`
+- chave/valor com mais performance: `MMKV`
+- dados estruturados, relacionais ou offline-first: `SQLite`
+
 ---
 
 ## Parte 11 — Permissões
@@ -2027,9 +2555,28 @@ Por padrão, nenhum app tem permissão de acessar dados privados do usuário (c�
 
 No Expo, cada módulo possui seu próprio método de solicitação de permissão — não é necessário gerenciar manualmente o arquivo `AndroidManifest.xml` na maioria dos casos.
 
+Do ponto de vista de produto, pedir permissão cedo demais é um erro comum. O ideal é solicitar a permissão **no momento em que ela faz sentido**.
+
+Exemplo:
+
+- ao abrir a tela pela primeira vez, explique por que a câmera será usada
+- só então peça a permissão
+- se o usuário negar, ofereça uma alternativa ou explique como continuar sem aquele recurso
+
+Isso melhora a taxa de aceitação e evita a sensação de que o app está pedindo acesso "do nada".
+
 ---
 
 ### 11.2 Câmera e Galeria
+
+O fluxo correto quase sempre é:
+
+1. pedir a permissão
+2. validar se foi concedida
+3. abrir câmera ou galeria
+4. tratar o caso em que o usuário cancela a ação
+
+Perceba que permissão concedida não significa imagem selecionada. São etapas diferentes.
 
 ```bash
 npx expo install expo-image-picker
@@ -2072,9 +2619,19 @@ async function tirarFoto() {
 }
 ```
 
+Boa prática: trate também o caso de negação permanente com uma mensagem clara, orientando o usuário a revisar a permissão nas configurações do sistema se quiser usar o recurso depois.
+
 ---
 
 ### 11.3 Localização
+
+Localização merece cuidado especial porque é uma das permissões que mais impactam privacidade e bateria. Antes de pedir acesso, tenha clareza sobre qual necessidade existe:
+
+- localização única para preencher endereço
+- localização ao abrir o mapa
+- acompanhamento contínuo em background
+
+Cada caso tem implicações diferentes de UX e de consumo de recursos.
 
 ```bash
 npx expo install expo-location
@@ -2100,6 +2657,8 @@ async function obterLocalizacao() {
 }
 ```
 
+Se o seu app só precisa da localização uma vez, evite lógica contínua. Quanto mais simples o uso, mais fácil justificar a permissão para o usuário.
+
 ---
 
 ## Parte 12 — Frameworks de UI e Ícones
@@ -2109,6 +2668,14 @@ async function obterLocalizacao() {
 ### 12.1 React Native Paper
 
 React Native Paper implementa o Material Design 3 para React Native.
+
+Ele é uma boa escolha quando você quer:
+
+- componentes prontos e consistentes
+- acessibilidade razoável já embutida
+- velocidade para montar telas sem reinventar botão, input, card e app bar
+
+O ganho principal não é só visual. É também de consistência entre telas.
 
 ```bash
 npm install react-native-paper react-native-vector-icons
@@ -2152,11 +2719,17 @@ function TelaCadastro({ navigation }) {
 }
 ```
 
+Frameworks de UI ajudam bastante no começo, mas não substituem entendimento de layout, estado e navegação. Pense neles como aceleradores, não como atalhos mágicos.
+
 ---
 
 ### 12.2 NativeWind
 
 NativeWind permite usar classes Tailwind CSS no React Native.
+
+Ele costuma agradar especialmente quem vem do front-end web e já pensa em utilitários como `p-4`, `rounded-xl` e `flex-row`.
+
+O benefício principal é a velocidade de composição visual. O risco principal é exagerar na quantidade de classes e deixar componentes difíceis de ler. Se a linha de `className` começou a virar um parágrafo, talvez seja hora de extrair um componente ou organizar melhor os estilos.
 
 ```bash
 npm install nativewind
@@ -2185,6 +2758,15 @@ function CartaoPerfil({ nome, cargo, avatar }) {
 ---
 
 ### 12.3 Ícones
+
+Ícones parecem detalhe, mas ajudam o usuário a reconhecer áreas do app com mais velocidade. Ainda assim, ícone bom quase sempre vem acompanhado de contexto, principalmente em navegação e ações críticas.
+
+Boas práticas:
+
+- mantenha uma família de ícones consistente
+- use nomes semanticamente claros
+- evite depender só do ícone quando o texto melhora compreensão
+- preserve tamanho e área de toque adequados
 
 ```bash
 # Expo (já incluso):
@@ -2224,6 +2806,15 @@ function BarraNavegacao() {
 ### 13.1 Animated API
 
 A Animated API é nativa do React Native e não requer instalação adicional.
+
+Ela resolve muito bem animações simples de interface:
+
+- feedback de toque
+- fade in / fade out
+- escala
+- translação
+
+Quando o objetivo é apenas deixar a interação mais agradável, ela costuma ser suficiente.
 
 ```tsx
 import { Animated, TouchableOpacity, View, Text } from 'react-native';
@@ -2266,11 +2857,22 @@ function BotaoAnimado() {
 }
 ```
 
+O ponto mais importante sobre animação é intenção: animar para comunicar estado, foco, continuidade ou resposta ao toque. Animação sem função tende a cansar a experiência.
+
 ---
 
 ### 13.2 Reanimated 3
 
 Reanimated 3 executa animações diretamente na thread nativa de UI, garantindo 60fps mesmo com carga na thread JavaScript.
+
+Ele é indicado quando a animação deixa de ser decorativa e passa a ser uma parte importante da experiência:
+
+- gestos complexos
+- cards arrastáveis
+- transições sofisticadas
+- efeitos que precisam continuar fluidos mesmo sob carga
+
+Em resumo: `Animated` cobre o básico com simplicidade; `Reanimated` cobre cenários mais exigentes com mais poder.
 
 ```bash
 npm install react-native-reanimated
@@ -2323,6 +2925,15 @@ function CartaoAnimado() {
 
 Lottie renderiza animações vetoriais criadas no Adobe After Effects.
 
+Ele é ótimo quando a animação vem do design, não do código. Em vez de programar cada frame, o app apenas reproduz um arquivo JSON exportado.
+
+Casos comuns:
+
+- tela de loading
+- sucesso/erro de ação
+- onboarding
+- empty states mais expressivos
+
 ```bash
 npm install lottie-react-native
 ```
@@ -2350,9 +2961,27 @@ Sites para baixar animações Lottie gratuitas: [lottiefiles.com](https://lottie
 
 TypeScript é o padrão do ecossistema React Native. O `create-expo-app` já gera projetos TypeScript por padrão.
 
+O valor do TypeScript não está em “escrever mais código”, e sim em reduzir ambiguidades. Ele ajuda a responder cedo perguntas como:
+
+- este campo pode ser `null`?
+- essa função recebe string ou número?
+- essa rota exige parâmetros?
+- esse objeto realmente tem essa propriedade?
+
+Em app mobile, onde muita coisa conversa com API, navegação, armazenamento e componentes, essa previsibilidade reduz bastante erros de runtime.
+
 ---
 
 ### 14.1 Tipagem de componentes e props
+
+Tipar props significa formalizar o contrato do componente. Isso deixa claro:
+
+- o que é obrigatório
+- o que é opcional
+- quais tipos são aceitos
+- como o componente deve ser usado
+
+Sem esse contrato, o componente vira uma “caixa preta” fácil de usar errado.
 
 ```tsx
 // Interface declara o contrato do componente — o que ele aceita e o que é obrigatório
@@ -2389,6 +3018,16 @@ function CardProduto({ produto, onPress, destaque = false }: CardProdutoProps) {
 
 ### 14.2 Utility Types
 
+Utility Types são atalhos prontos do TypeScript para transformar tipos já existentes. Eles ficam especialmente úteis quando o formato dos dados muda conforme o caso de uso.
+
+Exemplo mental:
+
+- o modelo completo do produto pode vir da API
+- a tela de edição precisa só de parte dele
+- o POST talvez não aceite `id`
+
+Em vez de duplicar interfaces parecidas, você reaproveita o tipo original com regras de transformação.
+
 ```tsx
 interface Produto {
   id: number;
@@ -2417,6 +3056,14 @@ type ProdutoImutavel = Readonly<Produto>;
 ---
 
 ### 14.3 Tipagem de navegação
+
+Tipar navegação é uma das maiores fontes de valor do TypeScript em React Native. Sem isso, é muito fácil:
+
+- navegar para uma rota com nome errado
+- esquecer um parâmetro obrigatório
+- ler `route.params` assumindo campos que podem não existir
+
+Com os tipos corretos, o editor passa a avisar esses erros antes mesmo de o app rodar.
 
 ```tsx
 // navigation/types.ts — centraliza os tipos de todas as rotas
@@ -2459,6 +3106,16 @@ function TelaDetalhe({ navigation, route }: DetalheScreenProps) {
 
 ### 14.4 Tipagem de estado e hooks
 
+Aqui o objetivo é fazer o tipo acompanhar o ciclo real do dado. Se um valor começa como `null` e só depois recebe dados da API, o tipo precisa representar essa possibilidade.
+
+O mesmo vale para hooks:
+
+- `useState` precisa refletir o formato do valor armazenado
+- `useRef` precisa refletir o tipo da referência
+- `useReducer` precisa refletir todos os estados e ações válidos
+
+Quando essa modelagem está bem feita, o código fica mais seguro e também mais legível.
+
 ```tsx
 // Estado com tipo explícito — necessário quando o valor inicial é null
 const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -2500,6 +3157,14 @@ const [estado, dispatch] = useReducer(reducer, { itens: [], carregando: false, e
 
 Por padrão, quando um componente pai re-renderiza, **todos os filhos re-renderizam também**, mesmo que suas props não tenham mudado. `React.memo` memoriza o componente e só o re-renderiza se suas props mudarem.
 
+Isso é útil quando o componente filho:
+
+- é renderizado muitas vezes
+- custa caro para montar
+- recebe props estáveis com frequência
+
+Mas existe um detalhe importante: `React.memo` não é um passe mágico. Se as props mudam de referência o tempo todo, ele não conseguirá ajudar.
+
 ```tsx
 // Sem React.memo — re-renderiza sempre que o pai re-renderiza
 function ItemLista({ titulo, onPress }) {
@@ -2519,6 +3184,13 @@ const ItemListaMemo = React.memo(function ItemLista({ titulo, onPress }) {
 ### 15.2 O problema com funções inline em FlatList
 
 Este é o erro de performance mais comum em React Native. Funções inline são recriadas a cada re-render, invalidando o `React.memo` dos filhos.
+
+O problema real não é “usar arrow function é proibido”. O problema é criar uma nova referência em pontos críticos, especialmente em listas grandes. Em uma `FlatList`, isso se multiplica rápido.
+
+Por isso, performance em React Native quase sempre passa por dois conceitos:
+
+- virtualização da lista
+- estabilidade de referências (`useCallback`, `useMemo`, props estáveis)
 
 ```tsx
 // ❌ Problema — função inline cria nova referência a cada render do pai
@@ -2558,6 +3230,10 @@ function ListaTarefas({ tarefas, onRemover }) {
 
 [Hermes](#hermes) é o motor JavaScript desenvolvido pela Meta especificamente para React Native. Ativo por padrão desde o RN 0.70.
 
+Você raramente “programa para o Hermes” diretamente, mas ele influencia muito a experiência final porque melhora o tempo de inicialização e o uso de memória.
+
+Na prática, isso significa que otimização em React Native não é só escrever componente melhor. Também envolve entender a plataforma de execução.
+
 | Aspecto | JavaScriptCore (motor antigo) | Hermes |
 |---|---|---|
 | Compilação | JIT (Just-In-Time) | AOT (Ahead-Of-Time) — compila no build |
@@ -2570,6 +3246,8 @@ Você não precisa configurar o Hermes — ele já está ativo. O que importa en
 ---
 
 ### 15.4 Tabela de otimizações
+
+Antes de aplicar qualquer técnica da tabela abaixo, vale uma regra simples: **otimize onde há gargalo observável**. Código mais “otimizado” nem sempre é mais legível, então a melhor otimização é a que resolve um problema real.
 
 | Técnica | O que resolve | Quando aplicar |
 |---|---|---|
@@ -2588,6 +3266,17 @@ Você não precisa configurar o Hermes — ele já está ativo. O que importa en
 
 ### 16.1 Estrutura de testes
 
+Pensar em testes por camadas evita dois extremos ruins:
+
+- testar tudo só por E2E, o que fica lento e caro
+- testar só funções isoladas e nunca validar a experiência real da interface
+
+Cada camada responde a perguntas diferentes:
+
+- teste unitário: a regra funciona?
+- teste de componente: a interface reage corretamente?
+- teste E2E: o fluxo inteiro funciona no app rodando de verdade?
+
 | Camada | Ferramenta | O que testa | Velocidade |
 |---|---|---|---|
 | Unitário | Jest | Funções puras, hooks, stores | Muito rápida |
@@ -2599,6 +3288,14 @@ Você não precisa configurar o Hermes — ele já está ativo. O que importa en
 ### 16.2 Jest — testes unitários
 
 Jest é pré-configurado em todos os projetos Expo e React Native CLI.
+
+Ele é a melhor ferramenta para testar lógica pura, porque esses testes são:
+
+- rápidos
+- baratos de manter
+- fáceis de executar com frequência
+
+Quanto menos dependência de UI, rede e ambiente externo um teste tiver, mais confiável e previsível ele tende a ser.
 
 ```tsx
 // utils/formatarPreco.ts
@@ -2649,6 +3346,14 @@ describe('useContador', () => {
 
 ### 16.3 React Native Testing Library
 
+A React Native Testing Library testa o componente mais perto da perspectiva do usuário. Em vez de verificar detalhes internos, a ideia é validar:
+
+- o que aparece na tela
+- o que muda após interação
+- se o usuário consegue acionar o comportamento esperado
+
+Isso leva a testes mais resilientes do que verificar implementação interna ou estado privado do componente.
+
 ```bash
 npm install --save-dev @testing-library/react-native
 ```
@@ -2690,6 +3395,14 @@ describe('BotaoLogin', () => {
 
 Um Error Boundary captura erros JavaScript durante a renderização de qualquer filho. Sem ele, um erro em qualquer componente derruba o app inteiro com tela branca.
 
+Limitação importante: ele **não captura tudo**. Error Boundary não pega automaticamente:
+
+- erros em event handlers
+- erros em código assíncrono fora da renderização
+- falhas nativas fora do escopo do React
+
+Ou seja: ele é uma rede de proteção útil, mas não substitui tratamento de erro em API, formulários e side effects.
+
 ```tsx
 // components/ErrorBoundary.tsx
 // Deve ser um componente de CLASSE (class component) — não existe versão hook ainda
@@ -2697,7 +3410,10 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 
 export class ErrorBoundary extends Component {
-  state = { temErro: false, erro: null };
+  constructor(props) {
+    super(props);
+    this.state = { temErro: false, erro: null };
+  }
 
   // Chamado quando qualquer filho lança um erro durante renderização
   static getDerivedStateFromError(erro) {
@@ -2711,6 +3427,10 @@ export class ErrorBoundary extends Component {
 
   render() {
     if (this.state.temErro) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>Algo deu errado</Text>
@@ -2750,11 +3470,24 @@ function TelaCarrinho() {
 }
 ```
 
+Uma estratégia madura é combinar:
+
+- Error Boundary para falhas de renderização
+- `try/catch` para ações assíncronas
+- Sentry para observabilidade em produção
+
 ---
 
 ### 17.2 Sentry
 
 Sentry é a ferramenta padrão do mercado para capturar e monitorar erros em produção.
+
+Ele não serve só para “guardar erro”. O valor real está em responder perguntas como:
+
+- qual tela está quebrando mais?
+- quantos usuários foram afetados?
+- qual versão do app gerou o problema?
+- qual ação aconteceu antes do erro?
 
 ```bash
 npx expo install @sentry/react-native
@@ -2795,6 +3528,15 @@ try {
 ### 18.1 React Hook Form + Zod
 
 React Hook Form gerencia formulários com alta performance (evita re-renders a cada tecla). Zod valida os dados com segurança de tipo.
+
+Esse par funciona muito bem porque cada biblioteca resolve uma parte diferente do problema:
+
+- React Hook Form gerencia entrada, submissão e estado do formulário
+- Zod descreve e valida o formato dos dados
+
+Na prática, isso cria uma fonte de verdade mais consistente. O mesmo esquema usado para validar pode orientar os tipos do formulário.
+
+No React Native, `Controller` aparece com frequência porque muitos inputs funcionam como componentes controlados e precisam de uma ponte entre a UI e o React Hook Form.
 
 ```bash
 npm install react-hook-form zod @hookform/resolvers
@@ -2876,11 +3618,21 @@ function FormularioCadastro() {
 | **Development Build** | Build customizado no dispositivo | SDK Expo + módulos nativos custom | Desenvolvimento de produção |
 | **Standalone (produção)** | APK/AAB/IPA publicado | Tudo | Publicação nas lojas |
 
+O erro mais comum de quem está começando é achar que Expo Go representa 100% do ambiente final. Ele é excelente para aprender e iterar rápido, mas não cobre todos os cenários nativos.
+
+Pense assim:
+
+- `Expo Go` acelera o início
+- `Development Build` aproxima o desenvolvimento do app real
+- `Standalone` é o artefato final que vai para a loja
+
 ---
 
 ### 19.2 EAS Build
 
 EAS (Expo Application Services) é a plataforma de build em nuvem do Expo. O build acontece nos servidores da Expo — sem necessidade de Android Studio ou Xcode instalados localmente.
+
+Isso muda bastante a experiência do time, porque a máquina do desenvolvedor deixa de ser o único lugar capaz de gerar build. O processo fica mais reproduzível e mais próximo de CI/CD.
 
 ```bash
 npm install -g eas-cli
@@ -2919,11 +3671,20 @@ eas submit --platform android
 eas submit --platform ios
 ```
 
+Em equipes pequenas, EAS reduz muito o atrito operacional. Em equipes maiores, ele ajuda a padronizar ambientes e distribuição interna.
+
 ---
 
 ### 19.3 Build com React Native CLI
 
 Para projetos sem Expo, o build é feito localmente com as ferramentas nativas.
+
+Aqui o ganho é controle total. O custo é a complexidade maior de ambiente, assinatura, certificados e configuração específica por plataforma.
+
+Em outras palavras:
+
+- Expo simplifica bastante o caminho
+- React Native CLI expõe mais diretamente o mundo nativo
 
 ```bash
 # ── ANDROID ────────────────────────────────────────────
@@ -2950,6 +3711,14 @@ cd android
 ---
 
 ### 20.1 Estrutura de projeto escalável
+
+Estrutura de pastas não é objetivo final; é ferramenta de organização. A melhor estrutura é a que facilita:
+
+- encontrar arquivos
+- isolar responsabilidades
+- evoluir features sem espalhar lógica em muitos lugares
+
+No começo, estruturas simples costumam vencer. Conforme o projeto cresce, separar por domínio, feature ou responsabilidade passa a fazer mais diferença.
 
 ```
 src/
@@ -2979,6 +3748,13 @@ src/
 ### 20.2 Separação entre UI e lógica
 
 Equivalente ao padrão MVVM do Android: a tela (View) não contém lógica; a lógica fica em um custom hook (ViewModel).
+
+Isso não significa que a tela nunca terá nenhuma lógica. Significa apenas que regras mais complexas, chamadas de API, transformação de dados e ações reutilizáveis não precisam ficar misturadas ao JSX.
+
+O benefício é duplo:
+
+- a UI fica mais legível
+- a lógica fica mais fácil de testar e reaproveitar
 
 ```tsx
 // ── HOOK DE LÓGICA — equivalente ao ViewModel ─────────────────────────
